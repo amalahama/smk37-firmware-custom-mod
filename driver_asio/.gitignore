@@ -5,6 +5,7 @@
 *.lib
 *.pdb
 *.log
+*.zip
 tests/*.exe
 
 # Python cache

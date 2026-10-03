@@ -1,62 +1,48 @@
-# Guía de Configuración ASIO de Mínima Latencia para M-VAVE SMK-37 Pro
+# Low-Latency Audio Configuration Guide for M-VAVE SMK-37 Pro
 
-El M-VAVE SMK-37 Pro cuenta con una interfaz de audio y MIDI USB Class-Compliant integrada (AC791N SoC):
-- **Audio:** 2 canales de entrada / 2 canales de salida, 44.1 kHz, 24-bit.
-- **MIDI:** USB-MIDI bi-direccional de alta velocidad.
-- **Generador DX7:** Los 6 operadores FM del sintetizador interno se pueden rutear directamente al audio USB.
-
----
-
-## 1. Controlador ASIO Instalado en tu Sistema
-
-En tu equipo Windows ya está instalado **ASIO4ALL v2** (`HKLM\Software\ASIO\ASIO4ALL v2`).
-ASIO4ALL proporciona acceso directo por **Kernel Streaming (WDM-KS)** al hardware de audio USB de la SMK-37 Pro, saltándose el mezclador del sistema de Windows (WASAPI compartido) para eliminar latencias de software y conseguir un retardo inferior a **3 ms**.
+The M-VAVE SMK-37 Pro features an integrated USB Class-Compliant audio and MIDI interface (JieLi AC791N SoC):
+- **Audio:** 2 input channels / 2 output channels, 44.1 kHz, 24-bit PCM.
+- **MIDI:** High-speed bidirectional USB-MIDI.
+- **DX7 FM Synth Engine:** The 6 operators of the internal FM engine can be routed directly to USB audio.
 
 ---
 
-## 2. Configuración Paso a Paso en tu DAW (Ableton, FL Studio, Reaper, Cubase, etc.)
+## 1. Native SMK-37 Pro Dedicated ASIO Driver (Recommended)
 
-1. Conecta la **SMK-37 Pro** por cable USB al PC y enciéndela.
-2. Abre tu DAW o programa de audio y dirígete a **Preferencias de Audio** (`Audio Settings`).
-3. En **Driver Type** (Tipo de controlador), selecciona:
-   ```text
-   ASIO
-   ```
-4. En **Audio Device** (Dispositivo de audio), selecciona:
-   ```text
-   ASIO4ALL v2
-   ```
-5. Pulsa en el botón **Hardware Setup / Control Panel** (Panel de Control de ASIO4ALL):
-   - Activa el modo experto haciendo clic en el icono de la **llave inglesa** (esquina inferior derecha del panel).
-   - En la lista de dispositivos de la izquierda, activa únicamente:
-     - `SMK-37 Pro` o `USB Audio Device`
-     *(Asegúrate de desactivar tarjetas integradas Realtek o HDMI para evitar contención de reloj).*
-   - **ASIO Buffer Size (Tamaño de Buffer):**
-     - Selecciona **64 Samples** (Latencia: ~1.45 ms).
-     - Si tu CPU sufre picos con proyectos muy cargados de plugins, selecciona **128 Samples** (~2.9 ms).
-   - **Latency Compensation (Compensación de Latencia):**
-     - In: `0 Samples`
-     - Out: `0 Samples`
-   - **Hardware Buffer (Buffer por Hardware):** Marcar la casilla (acceso directo sin capas intermedias).
-   - **Always Resample 44.1k <-> 48k:** Desmarcado (utilizar 44.1 kHz nativo).
+Our repository provides a dedicated, native 64-bit ASIO driver (`driver_asio/bin/SMK37Pro_ASIO.dll`):
+- Direct WASAPI Exclusive / Shared access with circular FIFO ring buffer.
+- Buffer sizes from 32 samples (0.73 ms) to 2048 samples (46.4 ms).
+- Standalone Win32 control panel (`SMK37Pro_ControlPanel.exe`).
+- Zero dependencies on third-party wrappers.
 
 ---
 
-## 3. Latencias Conseguidas
+## 2. Alternative Configuration via ASIO4ALL v2
 
-| Tamaño de Buffer (Samples) | Frecuencia de Muestreo | Latencia de Entrada | Latencia de Salida | Latencia Round-Trip Total |
-| :---: | :---: | :---: | :---: | :---: |
+If using ASIO4ALL v2 (`HKLM\Software\ASIO\ASIO4ALL v2`):
+1. Connect the **SMK-37 Pro** via USB cable and power it on.
+2. In your DAW, open **Audio Settings** and select **ASIO** -> **ASIO4ALL v2**.
+3. Open **Hardware Setup / Control Panel**:
+   - Enable advanced/expert mode (wrench icon).
+   - In the device list on the left, activate only: `SMK-37 Pro` / `USB Audio Device`.
+   - Set **ASIO Buffer Size** to `64 Samples` (~1.45 ms) or `128 Samples` (~2.9 ms).
+   - Uncheck "Always Resample 44.1k <-> 48k" to maintain native 44.1 kHz.
+
+---
+
+## 3. Measured Latencies (44.1 kHz)
+
+| Buffer Size (Samples) | Sample Rate | Input Latency | Output Latency | Total Round-Trip Latency |
+| :---:| :---:| :---:| :---:| :---:|
 | **64 samples** | 44.1 kHz | **1.45 ms** | **1.45 ms** | **~2.9 ms** |
 | **128 samples** | 44.1 kHz | **2.90 ms** | **2.90 ms** | **~5.8 ms** |
 | **256 samples** | 44.1 kHz | **5.80 ms** | **5.80 ms** | **~11.6 ms** |
 
 ---
 
-## 4. Opciones Alternativas: FlexASIO
+## 4. Alternative: FlexASIO Configuration
 
-Si prefieres usar **FlexASIO** (basado en WASAPI Exclusive), el instalador oficial ya ha sido descargado en:
-`downloads/FlexASIO-1.10b.exe`.
-Al ejecutarlo, puedes colocar el archivo de configuración `FlexASIO.toml` en tu carpeta de usuario (`C:\Users\amala\FlexASIO.toml`) con el siguiente contenido:
+If using **FlexASIO** (WASAPI Exclusive backend), create `FlexASIO.toml` in your user home directory:
 
 ```toml
 backend = "Windows WASAPI"

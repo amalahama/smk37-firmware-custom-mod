@@ -1,75 +1,53 @@
-# Guía de Conexión BLE-MIDI con Woovebox 3.0
+# Woovebox 3.0 BLE-MIDI Connection & Pairing Guide
 
-Esta guía explica el problema que impedía la conexión BLE entre el **M-VAVE SMK-37 Pro** y el **Woovebox 3.0**, la solución aplicada en el firmware personalizado **V017**, y los pasos para emparejarlos.
+This guide details how to pair the **M-VAVE SMK-37 Pro** keyboard controller with the **Woovebox 3.0** synthesizer/groovebox using custom firmware **v022**.
 
 ---
 
-## 1. Causa Raíz Descubierta en el Firmware de Fábrica (V11 a V16)
+## 1. Understanding the Woovebox BLE Host Architecture
 
-El Woovebox 3.0 (basado en ESP32-WROVER-E) en modo host (`hoSt bLE`) escanea el espectro Bluetooth Low Energy buscando dispositivos que anuncien en su paquete principal (`ADV_IND`) el identificador estándar de servicio **BLE-MIDI de la MIDI Association**:
-```text
-UUID: 03B80E5A-EDE8-4B33-A751-6CE34EC4C700
-En formato little-endian: 00 C7 C4 4E E3 6C 51 A7 33 4B E8 ED 5A 0E B8 03
+The Woovebox 3.0 (powered by an ESP32-WROVER-E) operates as a BLE Central host when booted in `hoSt bLE` mode:
+- **Scan & Discovery:** It continuously scans on channels 37, 38, and 39 looking for BLE-MIDI peripherals.
+- **Security & Bonding:** The ESP32's Bluedroid/NimBLE stack attempts to establish link encryption using unauthenticated *Just Works* pairing and stores the Long Term Key (LTK) in its NVS flash memory.
+- **GATT Routing:** Upon link completion, it discovers the standard Apple BLE-MIDI service (`03B80E5A-EDE8-4B33-A751-6CE34EC4C700`), enables notifications on characteristic `7772E5DB-3868-4112-A1A9-F2669D106BF3`, and routes incoming note packets to the currently selected Woovebox track.
+
+---
+
+## 2. Why Stock Firmware Failed (and How v022 Fixes It)
+
+1. **Secondary Advertising Loops:** Stock firmware launched secondary advertising bursts when the Woovebox subscribed to notifications. v022 nops this out (Patch 1 at `0x0013D2`), ensuring clean single-link operation.
+2. **Supervision Timeout Drops:** Stock firmware set a 1,000 ms timeout. v022 increases this to 4,000 ms (Patch 2 at `0x05839E`), tolerating ESP32 scheduling delays.
+3. **SMP Security Rejection:** Stock firmware requested MITM and PIN display (`123456`). v022 configures `auth_req = 0x01` and `IO_CAP = 3` (NoInputNoOutput) with BLE 4.0 Legacy Pairing support (Patch 3 at `0x087446`, `0x08758A`, `0x0875C4`).
+4. **Silent Notification Suppression:** Stock firmware dropped MIDI packets if the host didn't re-write the CCCD 0x2902 descriptor upon reconnecting. v022 transmits notifications unconditionally (Patch 4 at `0x000AEE`).
+5. **Stale Bond Record Purge:** v022 generates a clean, unique MAC address from VM key 108 (Patch 5 at `0x0035CE`, `0x003668`), bypassing any corrupted host bond caches.
+
+---
+
+## 3. Step-by-Step Pairing Instructions
+
+### Step 1: Flash Firmware v022
+Ensure your SMK-37 Pro has been updated to firmware **v022**:
+```bash
+python smk_ota_win.py flash SMK-37_Pro_custom_022.fwsc
 ```
 
-### El Fallo en el Código Original de M-VAVE:
-En la rutina de ensamblado del paquete de publicidad (`bt_ble_adv_enable` en el offset `0x00075E` de `app.bin`):
-- **Código original:**
-  ```assembly
-  75e: 05 f1 95 26    r5 = r2 + 1685   # b[r3+4] = r5 (tipo 0x07)
-  764: 10 8f          rep 4 16 { r7 = b[r5++=1]; b[r1++=1] = r7 }
-  ```
-- **Consecuencia:**
-  El cálculo `r2 + 1685` apuntaba a una tabla de datos genéricos en `0x0584AE` (`01 00 00 00 02 03 03...`) en vez de apuntar a la dirección real del UUID BLE-MIDI (`0x05838E`).
-- Por culpa de este error de puntero, el teclado transmitía un **UUID falso/basura** en el aire. El Woovebox filtraba los anuncios entrantes y **descartaba por completo el SMK-37 Pro**, haciendo imposible el emparejamiento.
+### Step 2: Turn on the Keyboard & Enable Bluetooth
+1. Turn on the SMK-37 Pro using its power switch.
+2. Ensure the **Wireless / BT** button is active (the blue "bt" LED blinks, waiting for a connection).
 
----
-
-## 2. El Parche Quirúrgico en V017 (`SMK-37_Pro_custom_017.fwsc`)
-
-Se ha corregido el cálculo de desplazamiento para redirigir el puntero exactamente al UUID 128-bit de BLE-MIDI:
-- **Código parcheado:**
-  ```assembly
-  75e: 05 f1 75 25    r5 = r2 + 1397   # b[r3+4] = r5
-  ```
-- **Resultado:**
-  El paquete de publicidad emitido por la SMK-37 Pro ahora contiene:
-  1. **Flags:** `02 01 06` (Modo general detectable, BR/EDR no soportado).
-  2. **128-bit Service UUID:** `11 07 00 C7 C4 4E E3 6C 51 A7 33 4B E8 ED 5A 0E B8 03` (Estándar BLE-MIDI oficial).
-  3. **Datos de Fabricante:** `06 FF 00 53 74 65 70`.
-  4. **Scan Response:** Nombre completo `"SMK-37 Pro"`.
-
----
-
-## 3. Parámetros de Conexión BLE y Latencia
-
-El firmware tiene preconfigurados en `0x5839E` los siguientes parámetros de negociación:
-- **Intervalo Mínimo:** 6 (7.5 ms).
-- **Intervalo Máximo:** 9 (11.25 ms).
-- **Latencia:** 0 (respuesta inmediata en cada evento de conexión).
-- **Supervision Timeout:** 100 (1000 ms).
-
-Estos valores cumplen al 100% con la especificación recomendada por Apple y la MIDI Association para comunicación BLE-MIDI de tiempo real.
-
----
-
-## 4. Instrucciones de Emparejamiento con Woovebox 3.0
-
-1. **Flashear el firmware V017:**
-   Sigue las instrucciones de flasheo ejecutando en el PC:
-   ```powershell
-   & .venv\Scripts\python.exe tools\smk_ota_win.py flash firmware_work\SMK-37_Pro_custom_017.fwsc
+### Step 3: Boot Woovebox in BLE Host Mode
+1. Power on the Woovebox while holding down the **`4/Ar` (Arp)** key.
+2. The Woovebox 4-character 16-segment display will show:
+   ```text
+   hoSt
+   bLE
    ```
-2. **Encender el SMK-37 Pro:**
-   - Asegúrate de que el indicador Bluetooth (icono BLE en la pantalla LCD) esté parpadeando (modo anuncio/broadcasting activo).
-3. **Poner el Woovebox en modo Host BLE:**
-   - En tu Woovebox, navega al menú del sistema (**SYS** / Glob).
-   - Ve a la página **bLE**.
-   - Gira el encoder hasta seleccionar **hoSt** (Host BLE).
-   - Pulsa el botón **Play** (o confirma con el botón de selección) para iniciar el escaneo.
-4. **Emparejamiento Automático:**
-   - El Woovebox detectará inmediatamente el servicio BLE-MIDI del SMK-37 Pro.
-   - En la pantalla del Woovebox aparecerá la confirmación de conexión (`Conn` / nombre del dispositivo).
-   - El icono Bluetooth en el SMK-37 Pro pasará de parpadear a estar **fijo**.
-5. **Listo para tocar:**
-   - Todas las 37 teclas, pads de velocidad, aftertouch, encoders, faders y ruedas de pitch/modulación enviarán eventos MIDI directamente al sintetizador y sampler del Woovebox con latencia ultra-baja.
+3. The Woovebox enters BLE Host scanning mode and boots to the active track (e.g. Track 4 or Track 1).
+
+### Step 4: Verification
+1. Within 2 to 5 seconds, the SMK-37 Pro's blue "bt" LED will switch from **blinking to solid blue**.
+2. Press any key on the SMK-37 Pro.
+3. The selected Woovebox track will play notes with near-zero latency and dynamic velocity tracking.
+
+> [!NOTE]
+> The Woovebox standalone 4-character LED display does **not** show toast text like "BLE CONNECTED". Solid illumination of the keyboard's "bt" LED and immediate audio output on key press confirms an established connection.

@@ -1,77 +1,78 @@
-# Plan de Trabajo Detallado: SMK-37 Pro Custom Firmware & ASIO Optimization
+# Detailed Project Roadmap: SMK-37 Pro Custom Firmware & ASIO Optimization
 
 ```mermaid
 flowchart TD
-    Fase1["Fase 1: Extracción y Desensamblado de FW V16"] --> Fase2["Fase 2: Diagnóstico y Sniffing BLE con Woovebox"]
-    Fase2 --> Fase3["Fase 3: Parche Quirúrgico BLE (ADV + Intervalos)"]
-    Fase3 --> Fase4["Fase 4: Optimización USB y Configuración ASIO"]
-    Fase4 --> Fase5["Fase 5: Reempaquetado .fwsc y Checksums"]
-    Fase5 --> Fase6["Fase 6: Flasheo Controlado vía OTA y Validación Hardware"]
+    Phase1["Phase 1: Extraction & Disassembly of FW v016"] --> Phase2["Phase 2: BLE Diagnostics & Sniffing with Woovebox"]
+    Phase2 --> Phase3["Phase 3: Surgical BLE Stack Patches (ADV + Intervals + SMP)"]
+    Phase3 --> Phase4["Phase 4: USB Optimization & Dedicated ASIO Driver"]
+    Phase4 --> Phase5["Phase 5: Container Repacking (.fwsc) & Checksums"]
+    Phase5 --> Phase6["Phase 6: Controlled USB OTA Flashing & Hardware Verification"]
 ```
 
 ---
 
-## Fase 1: Extracción y Desensamblado de SMK-37 Pro V16
-1. Desempaquetar `SMK-37_Pro_016.fwsc` extrayendo:
-   * Cabecera UFW y metadatos (`jlfw.yaml`).
-   * `app.bin` (código de aplicación principal).
-   * `cfg_tool.bin` y `cfg` (configuración de hardware).
+## Phase 1: Extraction & Disassembly of SMK-37 Pro v016 [COMPLETED]
+1. Unpack `SMK-37_Pro_016.fwsc` extracting:
+   * UFW container and metadata (`jlfw.yaml`).
+   * `app.bin` (main application code).
+   * `cfg_tool.bin` and `cfg` (hardware pinouts and configuration).
    * `uboot.boot` (SPL).
-2. Descifrar el bloque JLFS de `app.bin` con `jl_sfc_cipher` y clave `0x980F`.
-3. Desensamblar con el `objdump` pi32v2 del toolchain de JieLi y localizar:
-   * Llamada y tabla de datos para `hci_le_set_adv_data` y `hci_le_set_scan_rsp_data`.
-   * Estructura de la base de datos GATT (`0x02043680` o equivalente en V16).
-   * Parámetros de conexión BLE en `ble_link_init` (`0x01C09C50` / `0x01C09C54`).
-   * Descriptores y buffers de audio USB en `uac_config_init`.
+2. Decrypt the JLFS block of `app.bin` with `jl_sfc_cipher` and chipkey `0x980F`.
+3. Disassemble using the JieLi `pi32v2` objdump:
+   * Locate `hci_le_set_adv_data` and `hci_le_set_scan_rsp_data`.
+   * Map the GATT database structure (`0x02043680`).
+   * Trace BLE connection parameters in `ble_link_init`.
+   * Trace USB audio descriptors and buffers in `uac_config_init`.
 
 ---
 
-## Fase 2: Diagnóstico y Sniffing BLE
-1. Capturar el paquete de anuncio del SMK-37 Pro de fábrica mediante **nRF Connect** en Android/iOS:
-   * Obtener el hexadecimal bruto de `ADV_IND` y `SCAN_RSP`.
-   * Confirmar la omisión del UUID estándar `03B80E5A-EDE8-4B33-A751-6CE34EC4C700`.
-2. Probar la Woovebox 3.0 en modo `hoSt bLE` con otro controlador BLE MIDI de control para fijar la línea base de negociación esperada por el ESP32.
+## Phase 2: BLE Diagnostics & Sniffing [COMPLETED]
+1. Capture stock SMK-37 Pro advertising packets via **nRF Connect**:
+   * Inspect raw `ADV_IND` and `SCAN_RSP` frames.
+   * Analyze secondary advertising trigger when CCCD 0x2902 is enabled.
+2. Test Woovebox 3.0 in `hoSt bLE` mode to establish expected ESP32 negotiation baseline.
+3. Diagnose GATT notification gating and host NVS bonding record caching.
 
 ---
 
-## Fase 3: Parche Quirúrgico del Stack BLE en Firmware
-1. **Rediseño del Anuncio Publicitario (ADV Payload):**
-   * Estructurar el paquete `ADV_IND` (31 bytes máx):
-     * Flags: `0x02, 0x01, 0x06` (General Discoverable Mode, BR/EDR Not Supported).
-     * 128-bit Service UUID: `0x11, 0x07, 0x00, 0xC7, 0xC4, 0x4E, 0xE3, 0x6C, 0x51, 0xA7, 0x33, 0x4B, 0xE8, 0xED, 0x5A, 0x0E, 0xB8, 0x03`.
-   * Mover el nombre local completo (`SMK-37 Pro`) al paquete de respuesta de escaneo (`SCAN_RSP`).
-2. **Ajuste de Parámetros de Conexión BLE:**
-   * Fijar en la configuración del enlace:
-     * Min Connection Interval: `6` (7.5 ms).
-     * Max Connection Interval: `12` (15.0 ms).
-     * Slave Latency: `0`.
-     * Supervision Timeout: `200` (2.0 segundos).
+## Phase 3: Surgical BLE Stack Patches in Firmware [COMPLETED]
+1. **Secondary Advertising Bypass:**
+   * NOP out the secondary multi-client advertising trigger upon notification subscription (offset `0x0013D2`).
+2. **Connection Parameters & Supervision Timeout:**
+   * Increase supervision timeout to 4,000 ms and expand connection interval ceiling to 20-30 ms (offset `0x05839E`).
+3. **Security Manager Protocol (SMP):**
+   * Enforce unauthenticated "Just Works" pairing with bonding enabled (`auth_req = 0x01`, `IO_CAP = 3`, remove mandatory Secure Connections).
+4. **Unconditional Notification Dispatch:**
+   * Bypass CCCD check in `ble_midi_tx_packet_dispatch` (offset `0x000AEE`).
+5. **Fresh MAC Address Generation:**
+   * Redirect flash VM key from 102 to 108 (offsets `0x0035CE`, `0x003668`) to clear stale host bond caches.
 
 ---
 
-## Fase 4: Optimización USB y Drivers ASIO en Windows [COMPLETADA]
-1. **Lado Dispositivo:**
-   * Verificada transmisión continua de paquetes de audio UAC1 y USB MIDI sin jitter.
-2. **Lado Host (Windows):**
-   * Implementado driver ASIO nativo `SMK37Pro_ASIO.dll` con motor WASAPI Exclusive, buffers ping-pong y FIFO circular anti-dropouts / anti-CTD.
-   * Panel de control standalone y embebido Win32 (`SMK37Pro_ControlPanel.exe`).
-   * Validado en Ableton Live y suites DAW.
+## Phase 4: USB Optimization & Dedicated Windows ASIO Driver [COMPLETED]
+1. **Device Subsystem:**
+   * Verify continuous UAC1 audio streaming and low-jitter USB-MIDI message queues.
+2. **Host Driver (Windows):**
+   * Implement native user-mode COM InProc driver `SMK37Pro_ASIO.dll` with WASAPI Exclusive engine and ping-pong buffers.
+   * Implement circular FIFO ring buffer with drift clamping to eliminate dropouts and DAW crashes (CTD).
+   * Build standalone and embedded Win32 Control Panel (`SMK37Pro_ControlPanel.exe`).
+   * Validate across Ableton Live, Reaper, and FL Studio.
 
 ---
 
-## Fase 5: Reempaquetado Quirúrgico (.fwsc) [COMPLETADA]
-1. Aplicados 6 parches críticos sobre `app.bin` (anuncio secundario, intervalos/supervision timeout BLE, Just Works SMP bonding, NOP CCCD gate, generación de MAC limpia por clave VM 108).
-2. Generadas iteraciones incrementales hasta `SMK-37_Pro_custom_022.fwsc`.
-3. Recalculados todos los CRC16 de JLFS, recifrado SFC con clave `0x980F` e intercalación de marcadores de 36 bloques.
+## Phase 5: Container Repacking (.fwsc) [COMPLETED]
+1. Apply binary assembly patches on decrypted `app.bin`.
+2. Increment internal version strings and trailer markers to `SMK-37 Pro_022`.
+3. Recalculate all JLFS entry CRCs, `app_area_head` CRC, and UFW container header CRCs.
+4. Re-encrypt with `jl_sfc_cipher` (chipkey `0x980F`) and generate production binary `SMK-37_Pro_custom_022.fwsc`.
 
 ---
 
-## Fase 6: Flasheo y Validación Hardware [COMPLETADA]
-1. Flasheador OTA USB-MIDI SysEx (`smk_ota_win.py`) probado y operativo al 100%.
-2. Validación empírica con Woovebox 3.0 en modo `hoSt bLE` (`4/Ar`):
-   * Conexión instantánea y permanente sin bucles de desconexión.
-   * Envío ininterrumpido de notas MIDI con latencia ultra-baja.
-3. Validación empírica USB MIDI:
-   * Captura en WinMM libre de colisiones con 100% de respuesta dinámica (velocidades 25-93).
-4. Documentación técnica consolidada en `BLE_EXTENDED_PATCH.txt`.
-
+## Phase 6: Flashing & Hardware Verification [COMPLETED]
+1. Implement zero-dependency Windows SysEx OTA flasher (`smk_ota_win.py`) using `winmm.dll`.
+2. Empirical validation on hardware with Woovebox 3.0 in `hoSt bLE` (`4/Ar` mode):
+   * Instantaneous, permanent connection with solid "bt" LED.
+   * Continuous, real-time MIDI note transmission with near-zero latency.
+3. Empirical USB-MIDI validation:
+   * WinMM direct capture showing clean dynamic velocity tracking (25-93) across all 37 keys with 0 stuck notes.
+4. Comprehensive technical documentation consolidated in `BLE_EXTENDED_PATCH.txt`.

@@ -1,148 +1,151 @@
 # M-VAVE SMK-37 Pro Dedicated ASIO Driver
 
-Driver ASIO dedicado de ultra-baja latencia y alto rendimiento desarrollado a medida para el controlador/sintetizador **M-VAVE SMK-37 Pro** en sistemas Windows 10 y Windows 11 (64-bit).
+Dedicated high-performance, ultra-low-latency ASIO driver custom engineered for the **M-VAVE SMK-37 Pro** keyboard controller and synthesizer on Windows 10 and Windows 11 (64-bit).
 
 ---
 
-## 🚀 ¿Por qué este driver en lugar de ASIO4ALL?
+## 🚀 Why This Dedicated Driver Instead of ASIO4ALL?
 
-ASIO4ALL es un wrapper genérico que suele causar problemas en producción musical:
-1. **Bloqueo exclusivo destructivo**: Bloquea el audio de Windows impidiendo que el navegador, YouTube o Spotify suenen mientras produces.
-2. **Inestabilidad y cuelgues**: Con cambios de frecuencia de muestreo o reconexiones USB, puede congelar el DAW o provocar pantallazos azules.
-3. **Desincronización MIDI**: Problemas de alineación temporal de eventos MIDI en DAWs modernos.
+ASIO4ALL is a generic wrapper that frequently causes major issues in music production:
+1. **Destructive Exclusive Locking**: Locks Windows audio entirely, preventing web browsers, YouTube, or Spotify from playing while producing.
+2. **Instability & DAW Crashes**: Sample rate changes or USB disconnections can freeze DAWs or cause blue screens.
+3. **MIDI Desynchronization**: Jitter and timing alignment errors with MIDI hardware in modern DAWs.
 
-**El driver dedicado M-VAVE SMK-37 Pro ASIO soluciona todo esto:**
-- **Acceso directo WASAPI Exclusive / Shared**: Comunicación nativa de alto rendimiento con los endpoints Isochronous de audio del chip del SMK-37 Pro (32-bit Float / 24-bit PCM, 44.1 kHz & 48.0 kHz, 2 In / 2 Out).
-- **Latencia mínima real**: Búferes seleccionables en potencias de dos desde **32 samples (0.73 ms)** hasta **2048 samples (46.4 ms)**.
-- **Sincronización de Reloj QPC sin deriva**: Timestamps reales en nanosegundos basados en *QueryPerformanceCounter* del sistema (`kSystemTimeValid`, `kSamplePositionValid`, `kSampleRateValid`) perfectamente alineados con los mensajes MIDI de Windows.
-- **Limitador de latencia anti-deriva (Drift Clamp)**: Mantiene el búfer circular acotado y estable en sesiones de larga duración sin sobrecarga de CPU ni acumulaciones de retardo.
-- **Prioridad Pro Audio MMCSS en tiempo real**: Hilo de streaming con `AvSetMmThreadCharacteristicsW("Pro Audio")` y prioridad `THREAD_PRIORITY_TIME_CRITICAL` sin operaciones de I/O en disco durante el procesamiento.
-- **Panel de Control Integrado**: Accesible directamente desde tu DAW (botón *Hardware Setup* o *Control Panel*) o como aplicación independiente (`SMK37Pro_ControlPanel.exe`).
-- **Autónomo y ultra-ligero**: 100% estático, sin dependencias de DLLs externas ni instaladores de terceros.
+**The dedicated M-VAVE SMK-37 Pro ASIO driver resolves all of this:**
+- **Direct WASAPI Exclusive & Shared Support**: High-performance native communication with the SMK-37 Pro's USB Audio Class 1.0 Isochronous endpoints (32-bit Float / 24-bit PCM, 44.1 kHz & 48.0 kHz, 2 In / 2 Out).
+- **True Low Latency**: Buffer sizes selectable in powers of two from **32 samples (0.73 ms)** to **2048 samples (46.4 ms)**.
+- **Drift-Free QPC Clock Synchronization**: High-precision timestamps based on system *QueryPerformanceCounter* (`kSystemTimeValid`, `kSamplePositionValid`, `kSampleRateValid`) aligned with Windows MIDI events.
+- **Circular FIFO Ring Buffer with Drift Clamp**: Keeps audio streaming rock-solid during long production sessions, eliminating buffer underruns, distortion, and DAW crashes (CTD).
+- **Real-Time MMCSS Pro Audio Priority**: Dedicated audio streaming thread with `AvSetMmThreadCharacteristicsW("Pro Audio")` and `THREAD_PRIORITY_TIME_CRITICAL` without disk I/O in the audio path.
+- **Integrated Control Panel**: Accessible directly from within any DAW (*Hardware Setup* / *Control Panel* button) or as a standalone app (`SMK37Pro_ControlPanel.exe`).
+- **Self-Contained & Lightweight**: 100% static C++, zero dependencies on external DLLs or third-party installers.
 
 ---
 
-## 📊 Tabla de Latencias (44.1 kHz)
+## 📊 Latency Chart (44.1 kHz)
 
-| Tamaño de Búfer (Samples) | Latencia Unidireccional | Latencia Roundtrip (Aprox.) | Uso Recomendado |
+| Buffer Size (Samples) | One-Way Latency | Approximate Roundtrip Latency | Recommended Usage |
 |:---:|:---:|:---:|:---|
-| **32** | **0.73 ms** | **~ 1.8 ms** | Rendimiento extremo / Monitoreo ultra-rápido |
-| **64** | **1.45 ms** | **~ 2.9 ms** | Tocar en vivo y grabación de sintetizador |
-| **128** | **2.90 ms** | **~ 5.8 ms** | Proyectos medianos con sintetizadores e instrumentos |
-| **256** | **5.80 ms** | **~ 11.6 ms** | Producción general y mezcla fluida |
-| **512** *(Recomendado)* | **11.61 ms** | **~ 23.2 ms** | **Mezcla estándar con alta carga de plugins VST** |
-| **1024** | **23.22 ms** | **~ 46.4 ms** | Proyectos masivos con orquestas o automatización pesada |
-| **2048** | **46.44 ms** | **~ 92.8 ms** | Búfer relajado para masterización intensiva |
+| **32** | **0.73 ms** | **~ 1.8 ms** | Extreme performance / Ultra-responsive monitoring |
+| **64** | **1.45 ms** | **~ 2.9 ms** | Live playing and hardware synth recording |
+| **128** | **2.90 ms** | **~ 5.8 ms** | Medium projects with virtual instruments |
+| **256** | **5.80 ms** | **~ 11.6 ms** | General production and smooth tracking |
+| **512** *(Recommended)* | **11.61 ms** | **~ 23.2 ms** | **Standard mixing with heavy VST plugin loads** |
+| **1024** | **23.22 ms** | **~ 46.4 ms** | Massive projects with orchestral libraries / automation |
+| **2048** | **46.44 ms** | **~ 92.8 ms** | Relaxed buffer for intensive mastering |
 
 ---
 
-## 🎧 Asignación de Canales de Audio
+## 🎧 Audio Channel Routing
 
-El SMK-37 Pro integra un controlador MIDI, una interfaz de audio USB y un motor de síntesis FM (DX7):
+The SMK-37 Pro integrates a MIDI controller, USB audio interface, and internal FM (DX7) synthesizer engine:
 
-- **Entradas ASIO (Inputs 1 & 2)**:
+- **ASIO Inputs (Inputs 1 & 2)**:
   - `SMK-37 In L (DX7)`
   - `SMK-37 In R (DX7)`
-  - *Graba directamente el audio generado por el sintetizador interno del SMK-37 Pro en tu DAW sin cables de audio analógicos adicionales.*
-- **Salidas ASIO (Outputs 1 & 2)**:
+  - *Directly records audio generated by the internal hardware synth into your DAW without analog audio cables.*
+- **ASIO Outputs (Outputs 1 & 2)**:
   - `SMK-37 Out L`
   - `SMK-37 Out R`
-  - *Envía la salida de audio de tu DAW directamente a la salida de auriculares/jack de 3.5 mm del SMK-37 Pro con mínima latencia.*
+  - *Routes your DAW master output directly to the SMK-37 Pro's 3.5mm headphone/line-out jack with minimal latency.*
 
 ---
 
-## 🛠️ Instalación en 1 Clic
+## 🛠️ 1-Click Installation
 
-1. Descarga el paquete de lanzamiento (**Release**) o clona este repositorio.
-2. Haz clic derecho en `install_driver.bat` y selecciona **Ejecutar como administrador**.
-3. El instalador copiará los binarios a `%ProgramFiles%\M-VAVE SMK-37 Pro ASIO\` y registrará el driver en el Registro de Windows bajo `M-VAVE SMK-37 Pro ASIO` (CLSID `{7C38B80E-5AED-4B33-A751-6CE34EC4C701}`).
+1. Download the release package or clone this repository.
+2. Right-click `install_driver.bat` and select **Run as administrator**.
+3. The installer copies the binaries to `%ProgramFiles%\M-VAVE SMK-37 Pro ASIO\` and registers the COM InProc server under `M-VAVE SMK-37 Pro ASIO` (CLSID `{7C38B80E-5AED-4B33-A751-6CE34EC4C701}`).
 
 ---
 
-## 🎹 Configuración en tu DAW
+## 🎹 DAW Configuration Guides
 
 ### 1. Ableton Live
 
-#### A. Configurar el Audio ASIO
-1. Abre **Opciones > Preferencias** (`Ctrl + ,`) y ve a la pestaña **Audio**.
-2. **Driver Type**: Selecciona `ASIO`.
-3. **Audio Device**: Selecciona `M-VAVE SMK-37 Pro ASIO`.
-4. El desplegable **Buffer Size** de Ableton te permitirá elegir directamente desde 32 hasta 2048 muestras.
-5. Puedes pulsar **Hardware Setup** para abrir el Panel de Control y activar el modo *WASAPI Exclusive*.
+#### A. Configure ASIO Audio
+1. Open **Options > Preferences** (`Ctrl + ,`) and navigate to the **Audio** tab.
+2. **Driver Type**: Select `ASIO`.
+3. **Audio Device**: Select `M-VAVE SMK-37 Pro ASIO`.
+4. Use the **Buffer Size** dropdown to select your preferred buffer size (e.g. 128, 256, or 512 samples).
+5. Click **Hardware Setup** to open the Control Panel and toggle *WASAPI Exclusive* mode.
 
-#### B. Configurar el Teclado MIDI (¡Muy Importante!)
-1. En **Preferencias**, ve a la pestaña **Link, Tempo & MIDI**.
-2. En la tabla inferior de **Puertos MIDI**, localiza la fila `Input: SMK-37 Pro Midi`.
-3. Activa el botón **Pista (Track)** poniéndolo en **ON** (se iluminará en amarillo).
-4. *(Opcional)* Activa el botón **Remoto (Remote)** en `Input: SMK-37 Pro Midi` y `MIDIIN2 (SMK-37 Pro Midi)` para mapear las 8 perillas/knobs.
-5. En tu pista MIDI con sintetizador o plugin VST, asegúrate de que **MIDI From** esté en `All Inputs` y que el botón de **Armar grabación (círculo rojo)** esté activado (o Monitor en `In`).
+#### B. Configure MIDI Input (Crucial Step)
+1. In **Preferences**, switch to the **Link, Tempo & MIDI** tab.
+2. Under **MIDI Ports**, locate `Input: SMK-37 Pro Midi`.
+3. Toggle the **Track** button to **ON** (turns yellow).
+4. *(Optional)* Toggle **Remote** to **ON** for `Input: SMK-37 Pro Midi` and `MIDIIN2 (SMK-37 Pro Midi)` to map the 8 rotary encoders.
+5. In your MIDI track, set **MIDI From** to `All Inputs` (or `SMK-37 Pro Midi`, Channel 1) and arm recording.
 
 ---
 
 ### 2. FL Studio
-1. Ve a **Options > Audio Settings**.
-2. En **Input / Output**, selecciona `M-VAVE SMK-37 Pro ASIO`.
-3. Haz clic en **Show ASIO Panel** si deseas cambiar ajustes adicionales.
-
-### 3. REAPER
-1. Ve a **Options > Preferences > Audio > Device**.
-2. **Audio system**: Selecciona `ASIO`.
-3. **ASIO Driver**: Selecciona `M-VAVE SMK-37 Pro ASIO`.
-4. Activa las entradas y salidas (1 a 2).
-
-### 4. Cubase / Studio One
-1. Ve a la configuración de dispositivo de audio (**Studio Setup > Audio System**).
-2. Selecciona `M-VAVE SMK-37 Pro ASIO` como controlador principal.
+1. Open **Options > Audio Settings**.
+2. Under **Input / Output**, select `M-VAVE SMK-37 Pro ASIO`.
+3. Click **Show ASIO Panel** to adjust buffer sizes or exclusive mode.
 
 ---
 
-## 🎛️ Panel de Control
+### 3. REAPER
+1. Navigate to **Options > Preferences > Audio > Device**.
+2. **Audio system**: Select `ASIO`.
+3. **ASIO Driver**: Select `M-VAVE SMK-37 Pro ASIO`.
+4. Enable Inputs (1 to 2) and Outputs (1 to 2).
 
-Puedes abrir la interfaz de configuración en cualquier momento sin abrir un DAW ejecutando:
+---
+
+### 4. Cubase / Studio One
+1. Open audio setup (**Studio Setup > Audio System**).
+2. Select `M-VAVE SMK-37 Pro ASIO` as the master ASIO driver.
+
+---
+
+## 🎛️ Standalone Control Panel
+
+You can open the configuration interface at any time without launching a DAW:
 ```cmd
 SMK37Pro_ControlPanel.exe
 ```
-Permite:
-- Visualizar el dispositivo de audio USB detectado en tiempo real.
-- Seleccionar el tamaño de búfer ASIO deseado con cálculo instantáneo de latencia en milisegundos.
-- Alternar entre el modo **WASAPI Exclusive** (latencia ultra-baja y bypass del mezclador del sistema) y modo **Compartido** (permite reproducir música o YouTube mientras produces).
+Features:
+- Live detection of USB audio hardware endpoints.
+- Real-time buffer size adjustment with instant millisecond latency display.
+- Toggle between **WASAPI Exclusive** (lowest latency, mixer bypass) and **Shared** mode (allows background playback from browsers or Spotify).
 
 ---
 
-## 🔨 Compilación desde Código Fuente
+## 🔨 Building from Source
 
-El driver se compila de forma estática con **LLVM MinGW** o **GCC/MinGW-w64** (64-bit):
-
+Builds statically with **LLVM MinGW** or **GCC/MinGW-w64** (x86_64):
 ```cmd
 build_driver.bat
 ```
 
-Requisitos:
-- `clang++` o `g++` (x86_64) en el `PATH` del sistema.
-- Cabeceras estándar de Windows SDK (`windows.h`, `audioclient.h`, `avrt.h`, `commctrl.h`).
+Prerequisites:
+- `clang++` or `g++` (x86_64) on system `PATH`.
+- Standard Windows SDK headers (`windows.h`, `audioclient.h`, `avrt.h`, `commctrl.h`).
 
 ---
 
-## 🧪 Pruebas Automatizadas de Verificación
+## 🧪 Verification Tests
 
-La carpeta `tests/` contiene utilidades de prueba para validar la integridad del driver:
-- `test_timestamp.cpp`: Verifica la alineación de timestamps nanosegundo a nanosegundo con el reloj QPC del sistema.
-- `test_robustness.cpp`: Prueba transiciones de tamaño de búfer en caliente (32 a 2048 samples) en modo exclusivo y compartido.
-- `test_long_stream.cpp`: Prueba de resistencia de reproducción continua prolongada (30+ segundos) para verificar estabilidad de callbacks y ausencia de deriva de latencia.
-- `test_control_panel_sim.cpp`: Simula la apertura y cierre del panel de control desde el hilo de un DAW.
-- `test_midi.py`: Comprueba la recepción directa de notas y perillas MIDI a través del endpoint USB.
+The `tests/` directory provides test suites to validate driver stability:
+- `test_timestamp.cpp`: Verifies nanosecond timestamp alignment with system QPC clock.
+- `test_robustness.cpp`: Tests live buffer size transitions (32 to 2048 samples) across exclusive and shared modes.
+- `test_long_stream.cpp`: Extended continuous streaming test (30+ seconds) verifying zero buffer underruns and no latency drift.
+- `test_control_panel_sim.cpp`: Simulates control panel invocation from the host DAW thread.
+- `test_midi.py`: Direct hardware verification of USB-MIDI keybed and encoder messages.
 
 ---
 
-## 🗑️ Desinstalación
+## 🗑️ Uninstallation
 
-Para desregistrar el driver y eliminar sus claves COM del sistema:
+To unregister the COM driver and remove its registry keys:
 ```cmd
 uninstall_driver.bat
 ```
 
 ---
 
-## 📄 Licencia
+## 📄 License
 
-Este proyecto está bajo la Licencia **MIT**. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+This driver is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.

@@ -30,4 +30,4 @@ if exist "!INSTALL_DIR!" (
 echo.
 echo [SUCCESS] M-VAVE SMK-37 Pro ASIO Driver completely uninstalled.
 echo.
-pause
+if "%1"=="" pause

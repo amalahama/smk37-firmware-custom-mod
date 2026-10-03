@@ -75,4 +75,4 @@ echo ========================================================
 echo   BUILD COMPLETE!
 echo   Output files located in driver_asio\bin\
 echo ========================================================
-pause
+if "%1"=="" pause
