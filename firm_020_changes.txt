@@ -1,0 +1,158 @@
+================================================================================
+M-VAVE SMK-37 Pro Custom Firmware v020 — Technical Change Log
+================================================================================
+Target Hardware : M-VAVE SMK-37 Pro MIDI Controller
+System-on-Chip  : JieLi AC791N / WL82 (Dual-core pi32v2 architecture)
+Base Firmware   : Stock Firmware v016 (SMK-37_Pro_016.fwsc)
+Built Binary    : SMK-37_Pro_custom_020.fwsc
+Output SHA-256  : a21ab4506a9c23f7da1e3f2eff4980b2d76a774e5044b22143b275cecc473371
+Container Size  : 705,252 bytes (36 interleaved blocks)
+
+--------------------------------------------------------------------------------
+1. OVERVIEW & PROBLEM STATEMENT
+--------------------------------------------------------------------------------
+When attempting to pair the M-VAVE SMK-37 Pro over Bluetooth Low Energy (BLE)
+with embedded BLE Hosts/Centrals—most notably the Woovebox 3.0 (an ESP32-WROVER-E
+synthesizer running in host mode via '4/Ar' / 'hoSt bLE')—the keyboard would
+repeatedly connect, drop connection within seconds, and reconnect in an
+unusable infinite loop.
+
+Through reverse-engineering and disassembly of the decrypted app binary
+(app.bin, entry 0x02000000), three distinct root causes were identified in
+JieLi's BTStack implementation and application GATT layer. Firmware v020
+applies surgical opcode and table patches to eliminate these failure modes
+while preserving full compatibility with the official M-VAVE mobile app and
+standard DAW hosts.
+
+--------------------------------------------------------------------------------
+2. ROOT CAUSES & SURGICAL PATCHES
+--------------------------------------------------------------------------------
+
+[PATCH 1: BLE SECURITY MANAGER PROTOCOL (SMP) — ENFORCE "JUST WORKS"]
+--------------------------------------------------------------------------------
+* Root Cause:
+  In the stock JieLi Bluetooth stack initialization routine (ble_sm_init at
+  0x0207FD32 and ble_sm_auth_req_default at 0x0208743A), the Security Manager
+  configured:
+    - Default auth_req byte = 51 (0x33: SM_AUTHREQ_BONDING | SM_AUTHREQ_MITM).
+    - Local IO Capability = 5 (IO_CAPABILITY_KEYBOARD_DISPLAY).
+    - Default Passkey = "123456" (ble_sm_passkey_set_default at 0x02087396).
+    - Secure Connections requirement flag |= 0x0100 (at 0x020875B4).
+
+  Embedded BLE Centrals like the Woovebox are headless devices without a keypad
+  or display. They connect requesting unauthenticated "Just Works" pairing
+  (IO_CAPABILITY_NO_INPUT_NO_OUTPUT = 0x03, MITM = 0), conforming to the
+  Apple/MIDI Association BLE-MIDI standard.
+  Because the SMK-37 demanded MITM protection and passkey authentication,
+  pairing negotiation either timed out or was rejected. The Security Manager
+  then invoked sm_disconnect (0x020889A0) with reason 0x13 (HCI Remote User
+  Terminated Connection), immediately dropping the link.
+
+* Binary Offsets & Byte Modifications:
+  1. app.bin offset 0x087446 (inside ble_sm_auth_req_default):
+     Original : 4a 33         (r2 = 51)
+     Patched  : 42 20         (r2 = 0)
+     Effect   : Forces default auth_req = 0x00 (No MITM, No Bonding -> pure Just Works).
+
+  2. app.bin offset 0x08758A (inside ble_sm_param_pair_set):
+     Original : 42 25         (r2 = 5)
+     Patched  : 42 23         (r2 = 3)
+     Effect   : Sets IO Capability to 3 (IO_CAPABILITY_NO_INPUT_NO_OUTPUT).
+
+  3. app.bin offset 0x0875C4 (inside ble_sm_auth_flags_or):
+     Original : 31 28         (r1 |= 256)
+     Patched  : 00 00         (nop)
+     Effect   : Removes mandatory Secure Connections requirement.
+
+--------------------------------------------------------------------------------
+[PATCH 2: SUPPRESS SECONDARY BLE ADVERTISING ON CCCD NOTIFICATION ENABLE]
+--------------------------------------------------------------------------------
+* Root Cause:
+  In app.bin GATT write callback (0x0200138A), when a connected Central writes
+  to handle 115 (0x73, the Client Characteristic Configuration Descriptor /
+  CCCD for the BLE-MIDI data characteristic 0x72) to enable MIDI notifications,
+  the firmware attempted to prepare a second connection slot and executed:
+    0x020013E6: r0 = 1
+    0x020013E8: call 0x020006E8  (ble_set_adv_enable(1))
+
+  This launched secondary BLE advertising bursts on RF channels 37, 38, and 39
+  while link 1 was active.
+  Because the Woovebox runs a continuous BLE scan in 'hoSt bLE' mode, its host
+  scanner immediately detected the active keyboard advertising again. It
+  attempted to re-connect to the same MAC address, colliding with the existing
+  link. Additionally, RF time-slicing between advertising bursts and active link
+  events caused packet loss on the JieLi AC791N radio.
+
+* Binary Offset & Byte Modification:
+  app.bin offset 0x0013D2 (inside GATT CCCD write handler):
+     Original : 20 4e         (if (r0 == 0) goto 156 <0x02001470>)
+     Patched  : 24 8e         (goto 156 <0x02001470>)
+     Effect   : Unconditionally skips the second-slot allocation and secondary
+                advertising trigger, jumping directly to 0x02001470 to return
+                status 0 (ATT_ERROR_NONE / success).
+
+  Note: Primary BLE advertising on power-on and upon disconnection (0x000958,
+  0x000A10) remains intact. When disconnected from the host, the keyboard
+  immediately resumes normal discoverable advertising.
+
+--------------------------------------------------------------------------------
+[PATCH 3: BLE CONNECTION PARAMETER TOLERANCES]
+--------------------------------------------------------------------------------
+* Root Cause:
+  Stock firmware v016 configured an overly aggressive supervision timeout of
+  1,000 ms (0x0064 * 10 ms) and rigid connection intervals (7.5 - 11.25 ms).
+  Minor 2.4 GHz RF jitter or ESP32 RTOS scheduling delays could trigger an
+  abrupt link loss.
+
+* Binary Offset & Byte Modification:
+  app.bin offset 0x05839E (Connection Parameters Table):
+     Original : 06 00 09 00 00 00 64 00 0c 00 0c 00 00 00 64 00
+     Patched  : 06 00 10 00 00 00 90 01 0c 00 18 00 00 00 90 01
+     Effect   : Supervision timeout increased to 4,000 ms (0x0190 * 10 ms).
+                Connection interval ranges relaxed:
+                  - Set 1: Min 7.5 ms, Max 20 ms, Timeout 4,000 ms
+                  - Set 2: Min 15.0 ms, Max 30 ms, Timeout 4,000 ms
+
+--------------------------------------------------------------------------------
+[PATCH 4: TARGET VERSION BUMP (v020) & CONTAINER INTEGRITY]
+--------------------------------------------------------------------------------
+* Root Cause:
+  The official M-UPDATE utility checks version strings and interleaved block
+  markers. If the incoming firmware version is less than or equal to the version
+  already running on the device, M-UPDATE rejects the update.
+
+* Modifications:
+  1. app.bin offset 0x05837F: 'SMK-37 Pro_016' -> 'SMK-37 Pro_020'
+  2. app.bin offset 0x0587CC: 'SMK-37 Pro_016' -> 'SMK-37 Pro_020'
+  3. Container Trailer Marker: Updated decoded marker string to 'SMK-37 Pro_020'
+     via formula marker[i] = (ord(char) + i + 1) & 0xFF.
+  4. Recalculated CRC16 for:
+     - Patched app.bin
+     - JLFS entry at 0x4020
+     - App Area Head at 0x4000
+     - flash.bin container entry
+     - UFW top-level header and scrambled entry list
+  5. Re-encrypted App Area with JieLi SFC cipher using SMK-37 chipkey 0x980F.
+
+--------------------------------------------------------------------------------
+3. VALIDATION & TEST RESULTS
+--------------------------------------------------------------------------------
+1. Bit-For-Bit Roundtrip Integrity:
+   Unpacking stock v016 and repacking without patches produces an identical
+   SHA-256 hash (2d98ce72530e71d617384963423820536f094501299e2cfec0a8d3c3fb6bcfb0),
+   proving container encoding correctness.
+
+2. M-UPDATE Flashing:
+   Firmware v020 flashed successfully via USB-MIDI OTA without errors.
+
+3. Woovebox 3.0 Interoperability:
+   Tested with Woovebox booted in '4/Ar' ('hoSt bLE') mode:
+   - Handshake and GATT discovery complete immediately.
+   - Connection remains uninterrupted and stable indefinitely.
+   - MIDI notes and velocity transmitted in real time with ultra-low latency.
+   - Zero disconnect loops.
+
+4. M-VAVE Official App Compatibility:
+   The proprietary 0xAE advertising capability descriptor at 0x00075E was
+   strictly preserved, maintaining full mobile app configuration functionality.
+================================================================================

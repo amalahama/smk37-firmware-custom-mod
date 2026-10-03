@@ -1,0 +1,52 @@
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Downloads and external binaries
+downloads/
+toolchain/
+
+# Cloned third-party reference repositories
+FM-1-RE/
+smk-37-pro-docs/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+
+# Intermediate disassembly, dumps, and build objects
+firmware_work/disasm/
+firmware_work/v16_analysis/
+firmware_work/test_*/
+firmware_work/v*_unpack*/
+firmware_work/validation_unpack/
+firmware_work/*.elf
+firmware_work/*.o
+firmware_work/*.S
+firmware_work/*.s
+firmware_work/*.bin
+firmware_work/*.exe
+firmware_work/*.obj
+
+# Preserve custom firmware binaries and notes
+!firmware_work/*.fwsc
+!firmware_work/*.txt
+
+# Driver build artifacts (keep DLL and ControlPanel exe)
+driver_asio/bin/*.obj
+driver_asio/bin/*.ilk
+driver_asio/bin/*.pdb
+driver_asio/bin/*.exp
+driver_asio/bin/*.lib
+
+# Editor and OS
+.vscode/
+.idea/
+*.swp
+*.bak
+Thumbs.db
+[Dd]esktop.ini

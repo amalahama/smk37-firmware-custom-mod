@@ -1,0 +1,857 @@
+USER MANUAL
+SMK-37 PRO
+PITCH MOD
+K1 K2 K3 K4 K5 K6 K7 K8
+OCTAVE+
+FADER BANKKNOB BANK
+OCTAVE- PARA FX SEQ SEQ PLAY SEQ REC
+NOTE REPEAT SCALE CHORD GLOBE BTARP
+PATCH
+FADER1 FADER2 FADER3 FADER4
+■ 37-key velocity-sensitive MIDI keyboard with a three-octave range and built-in 
+DX-7 FM synth engine.
+■ 1.54" display.
+■ Pitch and modulation wheels
+■ 16 RGB backlit pads with velocity and aftertouch support.
+■ 4 faders, expandable to 8 using the fader bank button.
+■ Eight 360-degree rotary encoders.
+■ Built-in arpeggiator and note repeat function.
+■ Built-in sequencer with support for saving 8 patterns
+■ Internal Sound Source: This device features a built-in sound source with emulations of 
+the classic Yamaha DX-7 FM synthesizer. The Yamaha DX-7, released in 1983, 
+revolutionized digital synthesis with its use of frequency modulation (FM) synthesis, 
+offering a wide range of complex and expressive sounds. Renowned for its electric pianos, 
+bells, and evolving textures, the DX-7 remains a cornerstone in music history.Several 
+parameters can be adjusted directly on the device, while other parameters can be 
+adjusted through the USB MIDI output port. For detailed information, check page 7.
+■ USB Connection : Plug the cable through the USB port to the Windows/Mac it will 
+automatic be recognized as a midi device and a audio device, When plug into USB-C port 
+the SMK-37 PRO will be charging at the same time； 
+(Red light: charging, Green light: charging complete)
+■ Audio Playback and Recording
+For Playback , there are two options:When the patch function is enabled, you can use 
+the keys and pads to trigger the internal sound source. The SMK-37 Pro also supports 
+audio playback from the host. For added fun, you can play audio from the host while 
+simultaneously enabling the built-in synth engine. There are two ways to play audio 
+through the SMK-37 Pro:
+   ●USB Connection:
+When connected via USB to a PC/Mac, set the audio output device to "SMK-37 Pro." The 
+audio will then play through the audio jack on the device.
+ENFunction Overview
+-01-
+■SMK-37 PRO Midi Keyboard；
+■USB connection cable；
+■User manual；
+Packing List EN
+ENMaking The Connection
+   ●Wireless Connection:
+When searching for the device via BT, two options will appear in the list: one for audio 
+playback ("SMK-37 Pro") and one for MIDI ("SMK-37 Pro_BLE"). Connect to "SMK-37 Pro" 
+and set it as the audio output device in your system audio settings.
+For recording, there are two options:
+   ●Using USB: On Windows (PC), install a virtual ASIO driver and set the input device to 
+SMK37 Pro in your recording software.
+On macOS, use Core Audio (no additional drivers are required) and set the input device 
+directly to SMK37 Pro. This will allow both recording and playback.
+   ●Using an Audio Cable: Connect the audio cable to the appropriate input on your 
+recording device and configure your recording software to use the audio input.
+■ Wireless MIDI Connection:
+Press and hold the BT button. When the light is flashing, the wireless function is activated. 
+When the light stays on, the connection is successful. The wireless function is turned on by 
+default. Once you connect to a host, it will automatically reconnect the next time. If you 
+want to connect to a different host, please forget the device on the current host first.
+■ Wireless MIDI Adapter: Plug Wireless Adapter B into Windows/Mac, connection was 
+successfully when both lights stay on；
+■ Direct MIDI Wireless: Activated BT function of Windows/Mac/ios/Android, Select 
+SMK-37 PRO on the list (Windows users need BT 5.0 and extra BLE Midi Driver)；
+■ MIDI OUT Connection:
+   ●Cable Connection:  Use a 3.5mm to MIDI adapter to connect to an external device 
+that support MIDI In.
+   ●Wireless connection: Use Five-Pin wireless MIDI adapter A connecting to device such 
+as synthesizer or other device that support MIDI IN;
+ENMaking The Connection
+Wireless adapter A Wireless adapter B
+-02-
+① Back of Device:
+●Audio Output: 3.5mm audio output jack.
+●MIDI Out Port: Use a 3.5mm to MIDI adapter to connect to an external device that 
+support MIDI In.
+●Power: Switch to turn on/off the midi keyboard;
+●USB: USB-C Connection port;
+●Sustain: 1/4 inch sustain pedal connection port;
+② Pitch Wheel and Modulation Wheel
+Pitch Wheel: Scroll the pitch wheel up and down to control the pitch bend, the center 
+position is the original pitch of the sound, lift the finger up will release the sound to the 
+original pitch;
+Modulation Wheel: Scroll the modulation Wheel send continuous Midi CC message;
+Note: (You can assign the Modulation wheel use the Midi Learn function of Daw)
+③ Display area
+The display area provides visual feedback for various device settings and modes.
+ENPanel Introduction
+-03-
+①
+PITCH MOD
+K1 K2 K3 K4 K5 K6 K7 K8
+OCTAVE+
+FADER BANKKNOB BANK
+OCTAVE- PARA FX SEQ SEQ PLAY SEQ REC
+NOTE REPEAT SCALE CHORD GLOBE BTARP
+PATCH
+②
+③ ④ ⑤ ⑦
+⑧
+⑥
+FADER1 FADER2 FADER3 FADER4
+ENLeft button area / Arp 
+④ Button Area:
+●Knob Bank: Press this button to switch control to knobs 9–16.
+●Fader Bank: Press this button to switch control to faders 5–8.
+●Pad Bank: Press both Knob Bank and Fader Bank buttons simultaneously to switch 
+control to pads 17–32.
+●Left Button: Sends custom MIDI messages or accesses specific functions described on 
+the next page.
+●Right Button: Sends custom MIDI messages or accesses specific functions described on 
+the last page.
+⑤Knobs: Eight assignable 360-degree rotary encoders. These knobs can send Aftertouch, 
+MIDI CC, or pitch information, configurable through the MIDI SUITE software.
+⑥Pads
+Sixteen RGB back-lit pads with velocity-sensitive & aftertouch；
+⑦Faders: Four assignable faders that can be used to control various parameters in your 
+DAW or device software, such as volume, pan, or MIDI CC values.
+You can customize the MIDI messages sent by the Faders/Knobs/Pads using the MIDI 
+Suite software, available on all platforms.
+-04-
+⑧Button Area 2:
+●ARP : 
+Press the ARP button to enable the Arpeggiator function. 
+The Arpeggiator automatically plays a sequence of notes 
+based on the keys you hold. To adjust the arpeggiator 
+parameters, press and hold the ARP button while 
+rotating a knob. Alternatively, press and hold the ARP 
+button while pressing specific keys to change the 
+arpeggiator settings.
+Arpeggiator
+Mode-Up                  K1
+Octave-3                  K2
+Gate-35                    K3
+Swing-55                 K4
+Tempo-55               K5
+Rate-55                     K6
+Latch-off                  K7
+ENArp
+Modes: These determine the order in which the held notes are played:
+   ●Up: Notes are played in ascending order, from the lowest to the highest pitch.
+   ●Down: Notes are played in descending order, from the highest to the lowest pitch.
+   ●Incl (Inclusive): Notes are played in ascending order and then back down, with the 
+lowest and highest notes played twice, creating a mirrored effect.
+   ●Excl (Exclusive): Similar to Inclusive, but the lowest and highest notes are only played 
+once in the sequence.
+   ●Random: Notes are played in a random order, creating unpredictable and interesting 
+patterns.
+   ●Order: Notes are played in the precise order in which you press them.
+   ●Repeat: Held notes and pads will repeat continuously, creating a sustained, rhythmic 
+texture.
+Parameters: These settings allow you to further shape the arpeggio's sound and feel.
+   ●Octave: This setting expands the arpeggio across multiple octaves. For example, a 
+setting of "1" will play the held notes in the original octave and one octave higher.
+   ●Gate: Controls the length of each arpeggiated note. Higher values result in longer, 
+more sustained notes, while lower values create shorter, staccato notes.
+   ●Swing: Adds a rhythmic "groove" to the arpeggio by slightly delaying certain notes. 
+Higher swing values create a more pronounced, syncopated feel.
+   ●Tempo: Sets the overall speed of the arpeggio, measured in beats per minute (BPM). 
+The range is typically from 30 to 300 BPM.
+   ●Rate: Determines the rhythmic division of the arpeggio, relative to the tempo. 
+Common values include 1/4 notes, 1/8 notes, 1/16 notes, and their triplet equivalents 
+(indicated by "T," e.g., 1/4T). This allows you to create arpeggios with different rhythmic 
+complexities.
+   ●Latch: When enabled, the arpeggiator continues to play even after you release the 
+keys. This is useful for creating sustained arpeggios without having to hold down the keys. 
+Note: With Latch activated, pressing the Arp button will not deactivate the arpeggiator; 
+you must first disable Latch.
+-05-
+ENNote Repeat/Scale
+   ●Tempo: Set the tempo for the note repeat function.
+   ●Rate: Set the time division for note repeats based on the tempo (e.g., 1/4, 1/4T, 1/8, 
+1/8T, 1/16, 1/16T, 1/32, or 1/32T).
+   ●Latch: When enabled, the repeated notes will continue playing even after you lift your 
+fingers from the pads.
+(Note: If latch is on, pressing the Note Repeat button will not exit the note repeat 
+function. You must turn off the latch before exiting.)
+Scale:
+   
+●Base: Set the base note of the scale.
+   ●Scale Type: Select the scale type from the following options: Major, Minor, Dorian, 
+Lydian, Major Pentatonic, Minor Pentatonic, or World Scales 1–5.
+When the scale is set (e.g., to C Major), all notes within the scale will appear in blue on the 
+screen. If you press a note outside the scale, it will automatically be corrected to a note 
+within the scale, and the incorrect note will appear in grey.
+Note Repeat:  Note Repeat triggers repeated notes 
+while holding a pad
+   
+●Gate: Adjust the length of each repeated note. 
+Larger values result in longer note durations.
+   
+●Swing: Add rhythmic variation to the repeated 
+notes. Higher swing values create a groovier feel.
+-06-
+Note Repeat
+Gate-35                    K1
+Swing-55                 K2
+Tempo-55               K3
+Rate-55                     K4
+Latch-off                  K5
+Scale
+Base-C                      K1
+Scale-Major           K2
+Key c Major
+F2
+Channel-1
+ENChord/Globe
+Chord: 
+   ●Chord: Choose the basic chord quality, such as Major, Minor, 
+Diminished, or Augmented.
+   
+●Type: Add chord extensions to create more complex 
+harmonies, such as Triad (basic three-note chord), 7th 
+(four-note chord), 9th, 11th, or 13th (extended chords).
+Globe Menu:
+Access the Globe menu by holding the Globe button. While holding the Globe button:
+●Knob 1: Switch between presets 1–8.
+(You can edit the parameters for Knobs, Pads, and Faders, and save them as custom 
+settings in the presets using the MIDI Suite software for PC/Mac/Android/iOS.)
+●Knob 2: Change the key channel (range: 1–16).
+(Alternatively, hold the Globe button and press the corresponding channel number printed 
+above the keys.)
+●Knob 3: Change the pad channel (range: 1–16).
+(Alternatively, hold the Globe button and press the corresponding pad number, 1–16.)
+●Knob 4: Adjust the key velocity curve. A setting of 4 results in full velocity, meaning each 
+key press triggers at maximum velocity.
+●Knob 5: Adjust the pad velocity curve (functions similarly to the key velocity curve).
+●Knob 6: Toggle pad aftertouch on or off.
+(When enabled, holding a pad sends continuous aftertouch MIDI messages.)
+●Knob 7: Switch the sustain pedal function between Sustain and Expression.
+(In expression mode, the pedal sends custom continuous MIDI messages, with detailed 
+parameters editable via the MIDI Suite software.)
+●Globe Button + Right Button: Hold the Globe button and press the Right button to 
+access the next page, which includes factory reset.
+-07-
+Globe
+Rest Factory         K8
+Chord
+Chord-Maj              K1
+Type-Triad             K2
+Globe
+Preset-1                   K1
+Key Chn-1               K2
+Pad Chn-10           K3
+Key Vel-2                 K4
+Pad Vel-2                K5
+Pad Aft-on              K6
+Pedal-SUS              K7
+ENPatch/Para
+(When the Patch button is unpressed, the audio output port will not produce any sound.)
+●Feedback: Adjust feedback to allow an operator to modulate itself, producing richer 
+harmonic content or more distorted sounds.
+●Mono/Poly: Switch between monophonic (one note at a time) or polyphonic (multiple 
+notes simultaneously) playback modes.
+●Volume: Control the overall volume output of the device.
+●Latch: When turned on, it will latch the screen to this page, so it won't vanish after 
+releasing the button. 
+Patch:
+The device includes four banks of built-in presets. To select 
+presets within each bank, hold the Patch button and rotate 
+knobs 1–4.
+You can also import custom presets using the MIDI Suite 
+software for Windows/Mac or by directly sending the preset 
+files through the USB MIDI port using other software. When 
+importing presets, use knobs 1–4 to select the desired save 
+slot on the device.
+●Latch: When turned on, it will latch the screen to this page, so it won't vanish after 
+releasing the button. This allows browsing the presets while playing.
+PARA: Set some base parameters of build-in dx 7 engine , 
+these can be save to the current presets , 
+●Algorithm: Choose from 32 algorithms that define how the 
+internal operators interact (modulate each other or output 
+sound). Each algorithm dramatically alters the tonal 
+structure, providing a wide range of FM sounds.
+-08-
+PARA
+Algorithm-32       K1
+Feedback-56        K2
+Mono/Poly             K3
+Volume-12              K4
+Latch-Off                K5
+Preset Name
+BANK A                    K1
+BANK B                     K2
+BANK C                    K3
+BANK D                    K4
+Latch-Off               K5
+SAVE                        K8
+ENFx/Sequencer
+●Reverb: Control the dry/wet mix of the reverb effect to add depth and space to the 
+sound.
+●Delay: Control the dry/wet mix of the delay effect to create echoes and rhythmic 
+patterns.
+●Latch: When turned on, it will latch the screen to this page, so it won't vanish after 
+releasing the button. 
+Sequencer: The sequencer allows you to create and play back note patterns step-by-step 
+or in real time, with up to 64 steps and customizable parameters like Swing, Gate, and 
+Tempo.
+(Note: When Arp and Note Repeat are enabled, the sequencer cannot be activated.
+Entering the Sequencer:
+Press the Seq button to enter the sequencer. Press and hold the Seq button for additional 
+options.
+Pattern:
+The SMK-37 Pro supports saving up to 8 patterns directly on the device. Any edits made 
+to a pattern are automatically saved to the current pattern slot.
+Modes:
+The sequencer includes three modes: Key Mode, Drum Mode, and Live Mode.
+FX: add some effects to the sound to rich the sound , these 
+paramters can also save into the presets . 
+●Cutoff: Adjust the cutoff frequency of the low-pass filter to 
+shape the tonal balance of the sound.
+●Distortion: Control the dry/wet mix of the distortion effect 
+to add harmonic saturation or a more aggressive tone.
+-09-
+Sequencer
+Pattern-1                 K1
+Mode-Drum           K2
+Step-16                   K3
+Gate-50                   K4
+Swing-50                K5
+Tempo-120             K6
+Rate-1/4                   K7
+Sequencer
+SAVE                        K7
+Clean Pattern      K8
+FX
+Cut off-0                K1
+Distortion-0          K2
+Reverb-0                K3
+Delay-0                     K4
+Latch-Off                K5
+ENSequencer
+Key Mode:
+In Key Mode, the 16 pads function as 16 steps. There are two ways to record notes in 
+this mode:
+1.Manual Recording:
+Hold a pad to select the step, then press the desired keys to record them into that step.
+To remove a recorded key, press it again while the step is selected.
+The yellow rectangle represents the current step number. Use the Left and Right arrow 
+buttons to navigate between different pages of steps.
+2.Automatic Step Recording:
+Press the Seq Rec button to enable recording (the button will start flashing).
+While in recording mode, every key you press will automatically be recorded into the 
+current step, and the sequencer will advance to the next step.you can also record multiple 
+keys simultaneously into a single step.
+Extending Step Duration:
+To make a step last across multiple steps,press and hold the start step and the end step 
+simultaneously,then press the desired key to record it across the selected range of steps.
+Drum Mode:
+In Drum Mode, the 16 pads function as 16 tracks, each used to trigger a different drum 
+sound.
+  ●Selecting a Track:
+Press a pad once to select the track you want to trigger.
+Press the same pad again to enter the track editor for that specific drum sound.
+  ●Editing Notes in a Drum Track:
+Within the track editor, you can edit notes across up to 64 steps.
+The screen will display the step sequence for the selected track.
+-10-
+PAD-1
+Clear Step                   K1
+C0
+C1
+C2
+  ●Switching Between Tracks:
+To re-enter a different track, hold the Seq button and press another pad to select a 
+different drum track.
+Press the pad again to enter the track editor for the selected track.
+  ●Assigning MIDI Notes for Each Drum Track:
+To assign MIDI messages to each pad, use the MIDI Suite software for Windows/Mac. This 
+allows you to customize the MIDI note for each drum track.
+Live Mode
+Live Mode allows for real-time recording of MIDI notes with more precise time divisions, 
+making it ideal for capturing dynamic performances and intricate rhythms. This mode is 
+designed to give you flexibility in creating expressive and complex patterns on the fly.
+In Live Mode, the sequencer captures notes as you play them, with each note being 
+recorded in real-time rather than assigned to fixed steps. This enables a more fluid and 
+natural workflow compared to traditional step sequencing.
+Step:Determines how many steps the sequencer will play in a loop, with a maximum of 64 
+steps.
+More steps allow for longer patterns, while fewer steps result in shorter, repeating loops.
+Gate:Sets the length of each note.
+A higher gate value results in longer note durations, while a lower value creates shorter, 
+more staccato notes.
+Swing: Adds a rhythmic deviation to the notes, creating a "groovy" or "humanized" feel.The 
+higher the swing value, the more the timing of certain notes will shift, giving your 
+sequences a less robotic and more organic quality.
+Tempo: Sets the playback speed of the sequencer, measured in beats per minute 
+(BPM).Adjusting the tempo affects the overall pacing of your sequence. This is especially 
+useful for synchronizing with external devices or matching the desired song speed.
+Rate: Determines the time division of the arpeggiator or note playback relative to the 
+tempo.Available divisions include: 1/4, 1/4T, 1/8, 1/8T, 1/16, 1/16T, 1/32, and 1/32T.
+These divisions let you create anything from slow, deliberate patterns to fast, intricate 
+arpeggios or rhythms.
+Clear the Current Pattern Slot: To clear the current pattern slot: Press and hold the Seq 
+button and press the Right button.Navigate to the Clear Pattern Parameters.Rotate the 
+knob and press the Reset Key (printed on the last C note) to clear the current pattern.
+SAVE: Manually save the current sequencer pattern.
+ENSequencer
+-11-
+ENTechnology Parameters
+-12-
+ENMIDI Connection Method
+Our device is a class-compliant device, which means when using a USB cable, it won't 
+need any driver. Software that supports MIDI will automatically recognize the device.
+Wireless for Windows: Download and install the BT MIDI Connector from the QR code 
+below to use our devices wirelessly (Requires Windows 10 or later).
+Wireless for Mac:
+1.Open the Audio MIDI Setup
+2.Open MIDI Studio
+3.Click the BT icon
+4.Find the device and click 'Connect'
+Wireless for iOS/Android: For iOS/Android devices, it requires software that supports 
+BLE MIDI. Connect the SMK-37 PRO within software like GarageBand, FL Studio Mobile, 
+or Cubasis LE.
+Midi suite for windows Midi suite for mac Bt Midi Connector 
+Product Dimensions
+Product Weight 
+Keys
+Pads
+Knobs
+4 faders
+Endurance time
+Touch Stripes
+Output
+Power
+Battery Model/Type 
+Battery Nominal Voltage
+Battery capacity
+458mm(L) x 181mm (W)x 50mm(H)
+1.1Kg 
+37 velocity-sensitive keys
+16 RGB Back-Lit Pads with velocity-sensitive and after touch
+8 assignable endless 360 degree encoders
+4 assignable slide potentiometers
+10 hours
+Physical pitch bend control & Modulation control
+1/4 inch Sustain pedal connection port
+USB-C port
+Wireless MIDI connection with Windows/Mac/ios/Android
+3.5mm audio output jack 
+3.5mm Midi Out jack 
+Battery supplied or USB-bus-powered
+704060
+3.7V
+2000mAh
+★Changes or modifications not expressly approved by the party responsible for 
+compliance could void the user’s authority to operate the equipment. This equipment has 
+been tested and found to comply with the limits for a Class B digital device, pursuant to 
+Part 15 of the FCC Rules. These limits are designed to provide reasonable protection 
+against harmful interference in a residential installation. This equipment generates uses 
+and can radiate radio frequency energy and, if not installed and used in accordance with 
+the instructions, may cause harmful interference to radio communications. However, there 
+is no guarantee that interference will not occur in a particular installation. If this equipment 
+does cause harmful interference to radio or television reception, which can be determined 
+by turning the equipment off and on, the user is encouraged to try to correct the 
+interference by one or more of the following measures:
+‐‐ Reorient or relocate the receiving antenna.
+‐‐ Increase the separation between the equipment and receiver.
+‐‐ Connect the equipment into an outlet on a circuit different from that to which the 
+receiver is connected.
+‐‐ Consult the dealer or an experienced radio/TV technician for help.
+FCC Radiation Exposure Statement  
+The device has been evaluated to meet general RF exposure requirement. The device can 
+be used in portable exposure condition without restriction.
+This device complies with Part 15 of the FCC Rules. Operation is subject to the following 
+two conditions:
+(1)This device may not cause harmful interference.
+(2)This device must accept any interference received, including interference that may 
+cause undesired operation.
+ENFCC Warning Statement
+-13-
+■ 37 键力度感应 MIDI 键盘，具有三个八度音程范围。
+■ 1.54 英寸显示屏。
+■ 实体音高和调制轮。
+■ 16 个 RGB 背光打击垫，支持力度和触后。
+■ 4 个推子，使用推子库按钮可扩展到 8 个。
+■ 八个 360 度旋转编码器。
+■ 内置琶音器和音符重复功能。
+■ 内置音序器，支持保存 8 组预制。
+■ 内置音源：该设备具有内置音源（合成器引擎），可仿真经典的 Yamaha DX-7 FM 合成
+器。 Yamaha DX-7 于 1983 年发布，通过使用频率调制 (FM) 合成彻底改变了数字合成，提供
+了广泛的复杂而富有表现力的声音。 以其电子钢琴及其他电子音色而闻名，DX-7 仍然是音乐
+史上的基石几个参数可以直接在设备上调整，而其他参数可以通过 USB MIDI 输入端口进行调
+整。 有关详细信息，请查看第 7 页。
+CN功能概述
+-01-
+■SMK-37 PRO MIDI 键盘
+■USB 连接线
+■用户手册
+包装清单 CN
+■ USB 连接：将电缆插入 Windows/Mac 的 USB 端口，它将自动识别为 MIDI 设备和音频设
+备。 使用USB接口连接时，SMK-37 PRO 将同时充电；（红灯：充电中，绿灯：充电完成）
+■ 音频播放和录制
+播放功能：当启用Patch功能时，可以使用按键和打击垫来触发内置音源。SMK-37 Pro 同时支
+持从主机播放音频的功能。为了增加乐趣，你可以同时播放主机音频并启用内置合成器引擎进
+行演奏。通过 SMK-37 Pro 播放音频有两种方式：
+   ●USB 连接：通过 USB 连接到 PC/Mac 时，将音频输出设备设置为“SMK-37 Pro”。音频将
+通过设备的音频接口输出。
+CN连接
+   ●无线连接：通过BT搜索设备时，列表中会出现两个选项：一个用于音频播放（“SMK-37 
+Pro”），另一个用于 MIDI（“SMK-37 Pro_BLE”）。连接“SMK-37 Pro”后，在系统音频设置中
+将其设置为音频输出设备。
+用于录制，有两种选择： 
+   ●使用 USB：在 Windows (PC) 上，安装一个虚拟 ASIO 驱动程序，并将输入设备设置为 
+SMK37 Pro 在您的录音软件中。在 macOS 上，使用 Core Audio（无需额外驱动程序），并
+将输入设备直接设置为 SMK37 Pro。这将允许录制和播放。
+   ●使用音频线： 将音频线连接到录音设备上的相应输入，并配置您的录音软件以使用音频输
+入。
+■ 无线 MIDI 连接：按住 BT 按钮。当指示灯闪烁时，无线功能被激活。当指示灯常亮时，连
+接成功。无线功能默认开启。一旦您连接到主机，下次将自动重新连接。如果您想连接到不同
+的主机，请先忽略当前主机上的设备。
+■ 无线 MIDI 适配器：
+将无线适配器 B 插入 Windows/Mac，当两个指示灯都常亮时，连接成功。
+■ 直接 MIDI 无线：
+激活 Windows/Mac/iOS/Android 的 BT 功能，在列表中选择 SMK-37 PRO（Windows 用户需
+要支持 BT 5.0 和额外的 BLE Midi 驱动程序）；
+■ MIDI OUT 连接： 
+   ●有线连接：使用 3.5 毫米转 MIDI 适配器连接到支持 MIDI In 的外部设备。
+   ●无线连接：使用五针无线 MIDI 适配器 A 连接到合成器或其他支持 MIDI IN 的设备；
+CN连接
+Wireless adapter A Wireless adapter B
+-02-
+① 设备背面：
+●音频输出：3.5mm 音频输出插孔。
+●MIDI 输出端口：使用 3.5mm 转 MIDI 适配器连接到支持 MIDI In 的外部设备。
+●电源：用于打开/关闭 MIDI 键盘的开关；
+●USB：USB-C 连接端口；
+●延音：6.5毫米延音踏板连接端口；
+② 音高轮和调制轮
+●音高轮： 向上和向下滚动音高调制轮以控制音高弯音，中心位置是声音的原始音高，抬起手
+指将使声音恢复到原始音高；
+●调制轮： 滚动调制轮发送连续的 MIDI CC 消息；
+注意：（您可以分配调制轮的功能使用 DAW 的 MIDI Learn 功能）
+③ 显示区域
+显示区域为各种设置和模式调节提供视觉反馈。
+CN面板介绍
+-03-
+①
+PITCH MOD
+K1 K2 K3 K4 K5 K6 K7 K8
+OCTAVE+
+FADER BANKKNOB BANK
+OCTAVE- PARA FX SEQ SEQ PLAY SEQ REC
+NOTE REPEAT SCALE CHORD GLOBE BTARP
+PATCH
+②
+③ ④ ⑤ ⑦
+⑧
+⑥
+FADER1 FADER2 FADER3 FADER4
+CN左侧按钮区域 / 琶音器 (Arp)
+④ 按钮区域：
+●旋钮库 (Knob Bank)： 按下此按钮可将控制切换到旋钮 9-16。
+●推子库 (Fader Bank)： 按下此按钮可将控制切换到推子 5-8。
+●打击垫库 (Pad Bank)： 同时按下旋钮库(Knob Bank)和推子库 (Fader Bank)按钮可将控制
+切换到打击垫 17–32。
+●左按钮 (Left Button)： 发送自定义 MIDI 消息或在特定的功能中翻页。
+●右按钮 (Right Button)： 发送自定义 MIDI 消息或在特定的功能中翻页。
+⑤ 旋钮 (Knobs)： 八个可分配的 360 度旋转编码器。这些旋钮可以发送触后、MIDI CC 或
+Pitch码，可以通过 MIDI SUITE 软件进行配置。
+⑥ 打击垫 (Pads)： 十六个 RGB 背光打击垫，具有力度感应和触后功能；
+⑦ 推子 (Faders)： 四个可分配的推子，可用于控制 DAW 或设备软件中的各种参数，例如音
+量、声像或 MIDI CC 值。
+您可以使用 MIDI Suite 软件自定义推子/旋钮/打击垫发送的 MIDI 消息，该软件可在所有平台
+上使用，（或在DAW软件中MIDI Learn, 具体使用因不同DAW而不同请查阅对应DAW使用教
+程）
+-04-
+⑧ 按钮区域 2：
+●琶音 (ARP)：按下 ARP 按钮以启用琶音器功能。琶音器
+会根据您按住的琴键自动播放一系列音符。要调整琶音器参
+数，请在旋转旋钮的同时按住 ARP 按钮。或者，按住 ARP 
+按钮，同时按下特定琴键以更改琶音器设置。
+Arpeggiator
+Mode-Up                  K1
+Octave-3                  K2
+Gate-35                    K3
+Swing-55                 K4
+Tempo-55               K5
+Rate-55                     K6
+Latch-off                  K7
+CN琶音器 (Arp)
+模式 (Modes)：这些决定了按住的音符的播放顺序：
+   ●上行 (Up)：音符按升序播放，从最低音高到最高音高。
+   ●下行 (Down)：音符按降序播放，从最高音高到最低音高。
+   ●包含 (Incl (Inclusive))：音符按升序播放，然后下降，最低和最高音符播放两次，从而产
+生镜像效果。
+   ●排除 (Excl (Exclusive))：类似于包含，但最低和最高音符仅在序列中播放一次。
+   ●随机 (Random)：音符按随机顺序播放，产生不可预测和有趣的模式。
+   ●顺序 (Order)：音符按您按下的精确顺序播放。
+   ●重复 (Repeat)：按住的音符和打击垫将连续重复，从而产生持续的、有节奏的纹理。
+其余参数： 这些设置允许您进一步塑造琶音的声音和感觉.
+   ●八度 (Octave)：此设置将琶音扩展到多个八度。例如，设置为“1”将在原始八度和高一个
+八度音阶上播放按住的音符。
+   ●门限 (Gate)：控制每个琶音音符的长度。较高的值会产生更长、更持续的音符，而较低的
+值会产生更短、断奏的音符。
+   ●摇摆 (Swing)：通过稍微延迟某些音符，为琶音添加有节奏的“律动”。较高的摇摆值会产
+生更明显、切分的感觉。
+   ●速度 (Tempo)：设置琶音的整体速度，以每分钟节拍数 (BPM) 衡量。范围通常为 30 到 
+300 BPM。
+   ●速率 (Rate)：确定琶音相对于速度的有节奏的划分。常用值包括 1/4 音符、1/8 音符、
+1/16 音符及其三连音等效值（用“T”表示，例如 1/4T）。这使您可以创建具有不同节奏复杂性
+的琶音。
+   ●锁定 (Latch)：启用后，即使在您释放琴键后，琶音器也会继续播放。这对于创建持续的
+琶音而无需按住琴键非常有用。
+注意：启用锁定后，按下 Arp 按钮不会停用琶音器；您必须先禁用锁定。
+-05-
+CN音符重复/音阶 (Note Repeat/Scale)
+   ●速度 (Tempo)：设置音符重复功能的速度。
+   ●速率 (Rate)： 根据速度设置音符重复的时间划分（例如，1/4、1/4T、1/8、1/8T、
+1/16、1/16T、1/32 或 1/32T）。
+   ●锁定 (Latch)：启用后，即使您将手指从打击垫上抬起，重复的音符也会继续播放。
+（注意：如果锁定已开启，则按下音符重复按钮不会退出音符重复功能。您必须先关闭锁定才
+能退出。）
+音阶 (Scale)：
+   
+●根音 (Base)：设置音阶的根音。
+   ●音阶类型 (Scale Type)：从以下选项中选择音阶类型：大调(Major)、小调(Minor)、多里安
+(Dorian)、利底亚(Lydian)、大调五声音阶(Major Pentatonic)、小调五声音阶(Minor 
+Pentatonic)或世界音阶 1-5。
+设置音阶后（例如，C 大调），音阶内的所有音符都将以蓝色显示在屏幕上。如果您按下音阶
+外的音符，它将自动更正为音阶内的音符，并且错误的音符将以灰色显示。
+音符重复 (Note Repeat)：音符重复会在按住打击垫的同
+时触发重复的音符
+   ●门限 (Gate)：调整每个重复音符的长度。较大的值会
+导致更长的音符持续时间。
+   ●摇摆 (Swing)：为重复的音符添加有节奏的变化。较
+高的摇摆值会产生更流畅的感觉。
+-06-
+Note Repeat
+Gate-35                    K1
+Swing-55                 K2
+Tempo-55               K3
+Rate-55                     K4
+Latch-off                  K5
+Scale
+Base-C                      K1
+Scale-Major           K2
+Key c Major
+F2
+Channel-1
+CN和弦/全局 (Chord/Globe)
+和弦 (Chord)：
+   ●和弦 (Chord)：选择基本的和弦性质，例如大调、小调、减和
+弦或增和弦。
+   
+●类型 (Type)：添加和弦扩展以创建更复杂的和声，例如三和弦
+（基本的三音符和弦）、7th（四音符和弦）、9th、11th 或 13th
+（扩展和弦）。
+Globe 菜单：
+按住 Globe 按钮访问 Globe 菜单。在按住 Globe 按钮的同时：
+●旋钮 1 (Knob 1)：在预设 1-8 之间切换。
+（您可以使用 MIDI Suite 软件为 PC/Mac/Android/iOS 编辑旋钮、打击垫和推子的参数，并将
+它们保存为自定义设置。）
+●旋钮 2 (Knob 2)：更改琴键通道（范围：1-16）。
+（或者，按住 Globe 按钮并按下琴键上方打印的相应通道号。）
+●旋钮 3 (Knob 3)：更改打击垫通道（范围：1-16）。
+（或者，按住 Globe 按钮并按下相应的打击垫编号，1-16。）
+●旋钮 4 (Knob 4)：调整琴键力度曲线。设置为 4 意味满力度，这意味着每个琴键按下都会
+以最大力度触发。
+●旋钮 5 (Knob 5)：调整打击垫力度曲线（功能类似于琴键力度曲线）。
+●旋钮 6 (Knob 6)：切换打击垫触后开启或关闭。
+（启用后，按住打击垫会发送连续的触后 MIDI 消息。）
+●旋钮 7 (Knob 7)： 在延音和表情之间切换延音踏板功能。
+（在表情模式下，踏板会发送自定义的连续 MIDI 消息，详细参数可通过 MIDI Suite 软件编
+辑。）
+●Globe 按钮 + 右按钮 (Right Button)：按住 Globe 按钮并按下右按钮以访问下一页，其中
+包括出厂设置重置。
+-07-
+Globe
+Rest Factory         K8
+Chord
+Chord-Maj              K1
+Type-Triad             K2
+Globe
+Preset-1                   K1
+Key Chn-1               K2
+Pad Chn-10           K3
+Key Vel-2                 K4
+Pad Vel-2                K5
+Pad Aft-on              K6
+Pedal-SUS              K7
+CN音色/参数 (Patch/Para)
+（当 Patch 按钮未按下时，音频输出端口不会产生任何声音。）
+●Feedback (反馈)： 调整反馈以允许运算符自我调制，从而产生更丰富的谐波内容或更失真
+的声音。
+●Mono/Poly (单音/复音)： 在单音（一次一个音符）或复音（同时多个音符）播放模式之间
+切换。
+●Volume (音量)： 控制设备的整体音量输出。
+●Latch：开启后，它会将屏幕固定在当前页面，因此即使释放按钮，页面也不会消失。
+Patch (音色)：
+该设备包括四个内置预设库。要选择每个库中的预设，请按住 
+Patch 按钮并旋转旋钮 1-4。
+您还可以使用适用于 Windows/Mac 的 MIDI Suite 软件或通过
+使用其他软件直接通过 USB MIDI 端口发送预设文件来导入自定
+义预设。导入预设时，使用旋钮 1-4 选择所需的保存槽。
+●Latch：开启后，它会将屏幕固定在当前页面，因此即使释放
+按钮，页面也不会消失，可以在演奏时浏览预设。
+PARA： 设置内置 dx 7 引擎的一些基本参数，这些参数可以保
+存到当前预设中。
+●Algorithm (算法)： 从 32 种算法中选择，这些算法定义了内
+部运算符如何交互（相互调制或其他输出声音）。每种算法都
+会极大地改变音调结构，从而提供范围广泛的 FM 声音。
+-08-
+PARA
+Algorithm-32       K1
+Feedback-56        K2
+Mono/Poly             K3
+Volume-12              K4
+Latch-Off                K5
+Preset Name
+BANK A                    K1
+BANK B                     K2
+BANK C                    K3
+BANK D                    K4
+Latch-Off               K5
+SAVE                        K8
+CN效果器/音序器 (Fx/Sequencer)
+●Reverb (混响)： 控制混响效果的干/湿混合，以增加声音的深度和空间感。
+●Delay (延迟)： 控制延迟效果的干/湿混合，以创建回声和节奏模式。
+●Latch：开启后，它会将屏幕固定在当前页面，因此即使释放按钮，页面也不会消失。
+Sequencer (音序器)
+音序器：音序器允许您逐步或实时地创建和回放音符模式，最多 64 步，以及可自定义的参
+数，如摇摆、门限和速度。
+（注意：当 Arp 和音符重复启用时，音序器无法激活。）
+进入音序器：
+按下 Seq 按钮进入音序器。按住 Seq 按钮可获得更多选项。
+模式：
+SMK-37 Pro 支持直接在设备上保存多达 8 组预制。对预制所做的任何编辑都会自动保存到当
+前模式插槽。
+模式：
+音序器包括三种模式：琴键模式、鼓模式和实时模式。
+FX： 添加一些效果来丰富声音，这些参数也可以保存到预设
+中。
+●Cutoff (截止)： 调整低通滤波器的截止频率以塑造声音的音
+调平衡。
+●Distortion (失真)： 控制失真效果的干/湿混合，以添加谐波
+饱和度或更具侵略性的音调。
+-09-
+Sequencer
+Pattern-1                 K1
+Mode-Drum           K2
+Step-16                   K3
+Gate-50                   K4
+Swing-50                K5
+Tempo-120             K6
+Rate-1/4                   K7
+Sequencer
+SAVE                        K7
+Clean Pattern      K8
+FX
+Cut off-0                K1
+Distortion-0          K2
+Reverb-0                K3
+Delay-0                     K4
+Latch-Off                K5
+CN音序器 (Sequencer)
+琴键模式：
+在琴键模式下，16 个打击垫用作 16 步。在这种模式下有两种记录音符的方式：
+1. 手动录音：
+按住一个打击垫以选择步，然后按下所需的琴键以将它们录制到该步中。要移除录制的琴键，
+请在选择该步时再次按下它。黄色矩形表示当前步数。使用向左和向右箭头按钮在不同的步数
+页面之间导航。
+2. 自动步进录音：
+按下 Seq Rec 按钮以启用录音（该按钮将开始闪烁）。
+在录音模式下，您按下的每个琴键都会自动录制到当前步中，并且音序器将前进到下一步。您
+还可以同时将多个琴键录制到单个步中。
+延长步长持续时间：
+要使步长持续多个步长，请同时按住起始步长和结束步长，然后按下所需的琴键以将其录制到
+所选的步长范围内。
+鼓模式：
+在鼓模式下，16 个打击垫用作 16 个音轨，每个音轨用于触发不同的鼓声。
+选择音轨：
+  ●按下一个打击垫一次以选择要触发的音轨。
+在鼓音轨中编辑音符：
+  ●在音轨编辑器中，您可以编辑多达 64 步的音符。屏幕将显示所选音轨的步序。
+-10-
+PAD-1
+Clear Step                   K1
+C0
+C1
+C2
+  ●在音轨之间切换：
+要重新进入不同的音轨，请按住 Seq 按钮并按下另一个打击垫以选择不同的鼓音轨。
+再次按下打击垫以进入所选音轨的音轨编辑器。
+  ●为每个鼓音轨分配 MIDI 音符：
+要为每个打击垫分配 MIDI 消息，请使用适用于 Windows/Mac 的 MIDI Suite 软件。这允许您
+自定义每个鼓音轨的 MIDI 音符。
+实时模式：
+实时模式允许实时录制具有更精确时间划分的 MIDI 音符，使其非常适合捕捉动态演奏和复杂
+的节奏。此模式旨在让您灵活地即时创建富有表现力和复杂的模式。在实时模式下，音序器会
+捕捉您演奏的音符，每个音符都以实时方式录制，而不是分配给固定的步数。与传统的步进音
+序相比，这实现了更流畅和自然的流程。
+步数： 确定音序器将在循环中播放多少步数，最多 64 步。
+更多的步数允许更长的模式，而更少的步数导致更短的重复循环。
+门限： 设置每个音符的长度。
+较高的门限值会导致更长的音符持续时间，而较低的值会创建更短、更断音的音符。
+摇摆： 为音符添加节奏偏差，创造一种“流畅”或“人性化”的感觉。摇摆值越高，某些音符的定
+时偏移越多，从而使您的序列不那么机械化，更具有机品质。
+速度： 设置音序器的播放速度，以每分钟节拍数 (BPM) 为单位进行测量。调整速度会影响序
+列的整体节奏。这对于同步外部设备或匹配所需的歌曲速度特别有用。
+速率： 确定琶音器或音符播放相对于速度的时间划分。可用的划分包括：1/4、1/4T、1/8、
+1/8T、1/16、1/16T、1/32 和 1/32T。这些划分让您可以创建从慢速、慎重的模式到快速、复
+杂的琶音或节奏的任何内容。
+清除当前模式插槽： 要清除当前模式插槽：按住 Seq 按钮并按下右按钮。导航到清除模式参
+数。旋转旋钮并按下重置键（印在最后一个 C 音符上）以清除当前模式。
+SAVE：手动保存当前的音序器序列。
+CN音序器 (Sequencer)
+-11-
+CN技术参数
+-12-
+CNMIDI连接方式
+我们的设备是一个符合类别规范的设备，这意味着使用USB线缆时，不需要任何驱动程序。
+支持MIDI的软件将自动识别该设备。
+Windows无线连接：从下方的二维码下载并安装BT MIDI Connector，以无线方式使用我们
+的设备（需要Windows 10或更高版本）。
+Mac无线连接：
+1.打开音频MIDI设置
+2.打开MIDI工作室
+3.点击BT图标
+4.找到设备并点击"连接"
+iOS/Android无线连接：对于iOS/Android设备，需要支持BLE MIDI的软件。在
+GarageBand、FL Studio Mobile或Cubasis LE等软件中连接SMK-37 PRO。
+Midi suite for windows Midi suite for mac Bt Midi Connector 
+产品尺寸
+产品重量
+琴键
+鼓垫
+旋钮
+推子
+续航时间
+滑条触摸
+输出
+电源
+电池型号规格
+电池标称电压
+电池额定容量   
+修订
+458mm(L) x 181mm (W)x 50mm(H)
+1.1Kg
+37键力度感应琴键
+16个RGB背光支持力度感应和触后的打击垫
+8个可分配的360度旋转旋钮
+4个可分配的滑动电位器
+10小时
+实体弯音滑条和Modulation滑条
+6.35mm延音\表情踏板接口
+USB-C型接口
+无线MIDI连接Windows/Mac/ios/Android
+3.5mm音频输出接口
+3.5mm MIDI OUT 接口
+电池供电或USB供电
+704060
+3.7V
+2000mAh
+20250731

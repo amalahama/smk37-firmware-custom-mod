@@ -1,0 +1,211 @@
+================================================================================
+M-VAVE SMK-37 Pro BLE Extended Patch Documentation (v022)
+Comprehensive Technical Specification & Architecture Reference
+================================================================================
+Target Hardware : M-VAVE SMK-37 Pro MIDI Controller
+System-on-Chip  : JieLi AC791N / WL82 (Dual-core pi32v2 32-bit architecture)
+Base Firmware   : Stock Firmware v016 (SMK-37_Pro_016.fwsc)
+Current Binary  : SMK-37_Pro_custom_022.fwsc
+Output SHA-256  : fe51c1c6eba90dc9aabe40900457aa1c1ddb3d9c32391335b1aceaded1d2035f
+Container Layout: 705,252 bytes (36 interleaved blocks, SFC encrypted, chipkey 0x980F)
+
+================================================================================
+1. EXECUTIVE SUMMARY & OBJECTIVES
+================================================================================
+The stock firmware (v011 to v016) of the M-VAVE SMK-37 Pro keyboard contains multiple
+architectural flaws and race conditions in its JieLi Bluetooth Low Energy (BLE)
+stack and application GATT layer. These flaws prevent reliable pairing and
+operation with embedded BLE Central hosts—most notably the Woovebox 3.0 (an
+ESP32-based groovebox/synthesizer operating in 'hoSt bLE' / '4/Ar' Central mode).
+
+Symptoms in stock firmware included:
+  1. Infinite connection/disconnection loops (lasting 1-2 seconds per cycle).
+  2. One-time pairing success followed by permanent silence on reconnections
+     (Link Layer connected, but 0 MIDI notes transmitted).
+  3. Rejection of unauthenticated "Just Works" pairing by embedded BLE hosts.
+  4. Silent suppression of MIDI note notifications when hosts did not re-write
+     the Client Characteristic Configuration Descriptor (CCCD 0x2902).
+  5. Inability to clear stale/corrupted Host bond caches in external hosts.
+
+Firmware v022 applies a suite of surgical assembly and configuration patches to
+resolve all of these issues while maintaining full backward compatibility with
+USB MIDI, standard DAWs (Ableton, Logic, Reaper), and the official M-VAVE mobile app.
+
+================================================================================
+2. COMPREHENSIVE PATCH SPECIFICATIONS
+================================================================================
+
+--------------------------------------------------------------------------------
+PATCH 1: SUPPRESS SECONDARY BLE ADVERTISING (COLLISION PREVENTER)
+--------------------------------------------------------------------------------
+* Location:
+    app.bin offset: 0x0013D2 (Routine: GATT Write Handler 0x0200138A)
+* Original Opcode:
+    20 4e                   (if (r0 == 0) goto 156 <0x02001470>)
+* Patched Opcode:
+    24 8e                   (goto 156 <0x02001470>)
+* Disassembly Context:
+    0x020013BC: r0 = r7     ; con_handle
+    0x020013BE: r2 = b[r4]  ; data (CCCD value)
+    0x020013C0: r1 = r5     ; handle 115 (0x73, BLE-MIDI CCCD)
+    0x020013C2: call 0x02007E298 ; att_server_notify_enable
+    0x020013C8: r0 = r8     ; device state struct (0x01C332A0)
+    0x020013CA: r1 = b[r0+142]
+    0x020013CE: r0 = h[r0+r1<<1]
+    0x020013D2: 24 8e       ; [PATCHED] Unconditionally skip secondary slot advertising!
+    0x020013D4: call 0x020006B8 ; allocate second slot
+    ...
+    0x020013E8: call 0x020006E8 ; ble_set_adv_enable(1) -> secondary advertising
+* Technical Rationale:
+    In stock firmware, when a Central enabled BLE-MIDI notifications, the SMK-37
+    attempted to prepare a multi-client connection slot and triggered active BLE
+    advertising bursts on RF channels 37, 38, and 39 while Link 1 was active.
+    Host scanners (such as the Woovebox in continuous host scan) detected the
+    advertisement, attempted an overlapping connection to the same MAC address,
+    and caused packet loss or link abort.
+    The patch skips slot allocation and jumps directly to 0x02001470 (clean return 0),
+    ensuring clean, collision-free single-link operation.
+
+--------------------------------------------------------------------------------
+PATCH 2: BLE CONNECTION PARAMETER RELAXATION (RF STABILITY)
+--------------------------------------------------------------------------------
+* Location:
+    app.bin offset: 0x05839E (Connection Parameters Table)
+* Original Bytes:
+    06 00 09 00 00 00 64 00 0c 00 0c 00 00 00 64 00
+    - Set 1: Min 7.5 ms, Max 11.25 ms, Latency 0, Timeout 1,000 ms (0x0064 * 10 ms)
+    - Set 2: Min 15.0 ms, Max 15.0 ms,  Latency 0, Timeout 1,000 ms (0x0064 * 10 ms)
+* Patched Bytes:
+    06 00 10 00 00 00 90 01 0c 00 18 00 00 00 90 01
+    - Set 1: Min 7.5 ms, Max 20.0 ms,  Latency 0, Timeout 4,000 ms (0x0190 * 10 ms)
+    - Set 2: Min 15.0 ms, Max 30.0 ms, Latency 0, Timeout 4,000 ms (0x0190 * 10 ms)
+* Technical Rationale:
+    Embedded hosts (such as ESP32 running FreeRTOS) experience brief scheduling
+    jitter. A strict 1,000 ms supervision timeout frequently dropped links
+    during minor 2.4 GHz RF collisions. Increasing the supervision timeout to
+    4,000 ms and expanding the acceptable connection interval ceiling gives the
+    ESP32 host full flexibility while preserving ultra-low 7.5 ms minimum latency.
+
+--------------------------------------------------------------------------------
+PATCH 3: SECURITY MANAGER (SMP) JUST WORKS PAIRING WITH BONDING
+--------------------------------------------------------------------------------
+* Location 3a: app.bin offset 0x087446 (Routine: ble_sm_auth_req_default)
+    Original: 4a 33         (r2 = 51 / 0x33: MITM | Bonding | Keypress)
+    Patched : 42 21         (r2 = 1  / 0x01: SM_AUTHREQ_BONDING, No MITM)
+* Location 3b: app.bin offset 0x08758A (Routine: ble_sm_param_pair_set)
+    Original: 42 25         (r2 = 5: IO_CAPABILITY_KEYBOARD_DISPLAY)
+    Patched : 42 23         (r2 = 3: IO_CAPABILITY_NO_INPUT_NO_OUTPUT)
+* Location 3c: app.bin offset 0x0875C4 (Routine: ble_sm_auth_flags_or)
+    Original: 31 28         (r1 |= 256: Mandatory Secure Connections / SC)
+    Patched : 00 00         (nop: Removes mandatory SC requirement)
+* Technical Rationale:
+    1. Stock firmware demanded MITM authentication and Passkey Display ("123456").
+       Headless hosts without displays or keypads timed out and disconnected.
+    2. Changing IO Capability to 3 forces unauthenticated "Just Works" pairing.
+    3. Setting auth_req = 0x01 (Bonding enabled without MITM) ensures that the
+       central host can properly store the long-term encryption key (LTK) in its
+       NVS flash memory.
+    4. Disabling mandatory Secure Connections ensures 100% compatibility with
+       Bluetooth 4.0 / 4.2 Legacy Pairing implementations.
+
+--------------------------------------------------------------------------------
+PATCH 4: UNCONDITIONAL BLE-MIDI NOTIFICATION TRANSMISSION (CCCD BYPASS)
+--------------------------------------------------------------------------------
+* Location:
+    app.bin offset: 0x000AEE (Routine: ble_midi_tx_packet_dispatch 0x02000AD4)
+* Original Opcode:
+    00 53                   (if (r0 == 0) goto 38 <0x02000B16>)
+* Patched Opcode:
+    00 00                   (nop)
+* Disassembly Context:
+    0x02000AD4: [--sp] = {rets, r7-r4}
+    0x02000AD6: sp += -12
+    0x02000AE2: r0 = r4 + 1 ; handle 115 (0x73, CCCD)
+    0x02000AE4: r1 = r0.l
+    0x02000AE6: r0 = r6     ; con_handle
+    0x02000AE8: call 0x02007DB14 ; checks if client wrote CCCD = 1
+    0x02000AEE: 00 00       ; [PATCHED] NOP! Never abort if CCCD is unwritten!
+    0x02000AF0: r0 = 0
+    0x02000AF2: r2 = r6     ; con_handle
+    0x02000AF6: r3 = r4     ; value handle 114 (0x72)
+    0x02000AF8: [sp+4] = r7 ; data length
+    0x02000AFE: [sp] = r5   ; data buffer
+    0x02000B00: call 0x02007DEF2 ; att_server_notify() -> transmits notification!
+* Technical Rationale:
+    In stock firmware, routine 0x02000AD4 checked if the central host had set
+    CCCD = 1. If r0 was 0, it jumped to 0x02000B16 (returning error 5) and
+    silently discarded the MIDI note packet.
+    When embedded hosts reconnect to a bonded or cached device, they frequently
+    skip re-writing the CCCD (assuming the descriptor state was retained).
+    By NOPing this branch, the SMK-37 unconditionally transmits BLE-MIDI
+    notifications over any established Link Layer connection.
+
+--------------------------------------------------------------------------------
+PATCH 5: FRESH UNIQUE BLE MAC ADDRESS GENERATION (NVS PURGE)
+--------------------------------------------------------------------------------
+* Location 5a: app.bin offset 0x0035CE (Routine: bt_mac_addr_init 0x020035C4)
+    Original: 58 26         (r0 = 102 / 0x66: VM key for BT MAC)
+    Patched : 58 2c         (r0 = 108 / 0x6C: New unused VM key)
+* Location 5b: app.bin offset 0x003668 (Routine: bt_mac_addr_init 0x020035C4)
+    Original: 58 26         (r0 = 102 / 0x66: VM key for BT MAC)
+    Patched : 58 2c         (r0 = 108 / 0x6C: New unused VM key)
+* Technical Rationale:
+    The JieLi firmware caches its static public MAC address in Flash Virtual Memory
+    (VM) storage key 102. If an external host (like the Woovebox) has cached a
+    corrupted, failed, or half-bonded security record for that MAC address, the host
+    will perpetually reject or freeze GATT transactions upon reconnecting.
+    Redirecting the VM query to unused key 108 forces the JieLi firmware to execute
+    its true random/UID hash routine at 0x020035F2, assigning a completely new,
+    clean MAC address to the keyboard. To all external hosts, the SMK-37 appears
+    as a brand-new device, entirely bypassing any stale host-side bond records.
+
+--------------------------------------------------------------------------------
+PATCH 6: VERSION BUMP (v022) & CONTAINER REPACKING
+--------------------------------------------------------------------------------
+* Locations:
+    1. app.bin offset 0x05837F: 'SMK-37 Pro_016' -> 'SMK-37 Pro_022'
+    2. app.bin offset 0x0587CC: 'SMK-37 Pro_016' -> 'SMK-37 Pro_022'
+    3. Container Trailer Marker: Formula marker[i] = (ord(char) + i + 1) & 0xFF
+       updated across all 36 interleaved block trailers to decode to 'SMK-37 Pro_022'.
+* Checksum & Integrity Recalculations:
+    - Patched app.bin CRC16: 0xE09C
+    - Updated JLFS app.bin entry CRC at 0x4020
+    - Updated app_area_head data CRC16 at 0x4000: 0xEC52
+    - Re-encrypted App Area with JieLi SFC cipher (chipkey 0x980F)
+    - Updated UFW container flash.bin CRC16: 0xE996
+    - Scrambled header listcrc and hdrcrc recalculated (key 0xFFFF)
+    - Full container SHA-256: fe51c1c6eba90dc9aabe40900457aa1c1ddb3d9c32391335b1aceaded1d2035f
+
+================================================================================
+3. SYSTEM VERIFICATION & EMPIRICAL TEST RESULTS
+================================================================================
+1. USB MIDI Subsystem:
+   - Verified via test_midi.py (WinMM direct capture).
+   - Clean Note On (0x90) and Note Off (0x80) on Channel 1 across all 37 keys.
+   - Dynamic velocity tracking verified from 25 to 93.
+   - Zero dropped packets, zero stuck notes.
+
+2. Bluetooth Low Energy (Woovebox 3.0 Host Mode):
+   - Woovebox booted in 'hoSt bLE' ('4/Ar') mode.
+   - Peripheral discovered immediately without collision loops.
+   - Solid "bt" LED indicator upon Link Layer completion.
+   - Instantaneous, low-latency audio playback on Woovebox synthesizer engine.
+   - Sustained connection without disconnects across reboots.
+
+3. Official M-VAVE App:
+   - Advertising capability descriptor at 0x00075E preserved.
+   - Mobile application configuration and preset editing fully operational.
+
+================================================================================
+4. REPRODUCTION & AUTOMATED BUILD INSTRUCTIONS
+================================================================================
+To rebuild this firmware or generate future incremental versions:
+1. Ensure the Python environment has access to the JieLi tools in /tools.
+2. Execute the repacker script:
+     python tools/repack_smk.py
+3. The script will automatically unpack stock v016, apply all patches (Patches 1-7),
+   re-encrypt with SFC chipkey 0x980F, re-interleave markers, and emit:
+     firmware_work/SMK-37_Pro_custom_022.fwsc
+4. Flash to device via USB OTA:
+     python tools/smk_ota_win.py flash firmware_work/SMK-37_Pro_custom_022.fwsc
+================================================================================
