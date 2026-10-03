@@ -9,14 +9,15 @@ $SrcDll = Join-Path $ScriptDir "bin\SMK37Pro_ASIO.dll"
 $SrcExe = Join-Path $ScriptDir "bin\SMK37Pro_ControlPanel.exe"
 
 if (-not (Test-Path $SrcDll)) {
-    # Fallback to UNC path if running on network share
-    $UncDir = "\\AERONAS\ADRIAN_PERSONAL\PROGRAMACION\GEMINI ANTIGRAVITY\SMK37mod\driver_asio\bin"
-    $SrcDll = Join-Path $UncDir "SMK37Pro_ASIO.dll"
-    $SrcExe = Join-Path $UncDir "SMK37Pro_ControlPanel.exe"
+    $LocalCache = "$env:LOCALAPPDATA\M-VAVE SMK-37 Pro ASIO"
+    if (Test-Path (Join-Path $LocalCache "SMK37Pro_ASIO.dll")) {
+        $SrcDll = Join-Path $LocalCache "SMK37Pro_ASIO.dll"
+        $SrcExe = Join-Path $LocalCache "SMK37Pro_ControlPanel.exe"
+    }
 }
 
 if (-not (Test-Path $SrcDll)) {
-    Write-Error "Driver binary not found! Please build the driver first."
+    Write-Error "Driver binary not found! Please build the driver first or download the release."
     exit 1
 }
 

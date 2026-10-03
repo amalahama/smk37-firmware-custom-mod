@@ -1,0 +1,18 @@
+# Build artifacts
+*.obj
+*.o
+*.exp
+*.lib
+*.pdb
+*.log
+tests/*.exe
+
+# Python cache
+__pycache__/
+*.pyc
+.venv/
+
+# Editor / IDE
+.vscode/
+.idea/
+Thumbs.db
